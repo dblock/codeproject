@@ -53,7 +53,34 @@ namespace DirtyPanel {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel demoPanel;
+        protected global::System.Web.UI.UpdatePanel demoPanel;
+        
+        /// <summary>
+        /// demoTextBoxSimple control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox demoTextBoxSimple;
+        
+        /// <summary>
+        /// demoDropDown control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList demoDropDown;
+        
+        /// <summary>
+        /// demoRadio control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButtonList demoRadio;
         
         /// <summary>
         /// demoTextBox control.
@@ -65,6 +92,15 @@ namespace DirtyPanel {
         protected global::System.Web.UI.WebControls.TextBox demoTextBox;
         
         /// <summary>
+        /// demoCheckBox control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox demoCheckBox;
+        
+        /// <summary>
         /// demoButton control.
         /// </summary>
         /// <remarks>
@@ -72,5 +108,14 @@ namespace DirtyPanel {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button demoButton;
+        
+        /// <summary>
+        /// lastsaved control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lastsaved;
     }
 }

@@ -17,5 +17,11 @@ namespace DirtyPanel
         {
 
         }
+
+        public void save_Click(object sender, EventArgs e)
+        {
+            demoPanelExtender.ResetDirtyFlag();
+            lastsaved.Text = DateTime.Now.ToString();
+        }
     }
 }

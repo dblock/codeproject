@@ -1,9 +1,9 @@
-  <!--------------------------------------------------------------------------->  
+<!--------------------------------------------------------------------------->
 <!--                        IGNORE THIS SECTION                            -->
 <html>
 <head>
-<title>Dirty Panel Extender with ASP.NET Ajax</title>
-<Style>
+ <title>Dirty Panel Extender with ASP.NET Ajax</title>
+ <style>
 BODY, P, TD { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt }
 H2,H3,H4,H5 { color: #ff9900; font-weight: bold; }
 H2 { font-size: 13pt; }
@@ -12,77 +12,234 @@ H4 { font-size: 10pt; color: black; }
 PRE { BACKGROUND-COLOR: #FBEDBB; FONT-FAMILY: "Courier New", Courier, mono; WHITE-SPACE: pre; }
 CODE { COLOR: #990000; FONT-FAMILY: "Courier New", Courier, mono; }
 </style>
-<link rel="stylesheet" type=text/css href="http://www.codeproject.com/styles/global.css">
+ <link rel="stylesheet" type="text/css" href="http://www.codeproject.com/styles/global.css">
 </head>
-<body bgcolor="#FFFFFF" color=#000000>
-<!--------------------------------------------------------------------------->  
-
-
-<!-------------------------------     STEP 1      --------------------------->
-<!--  Fill in the details (CodeProject will reformat this section for you) -->
-
-<pre>
-Title:       Dirty Panel Extender (ASP.NET AJAX)
+<body bgcolor="#FFFFFF" color="#000000">
+ <!--------------------------------------------------------------------------->
+ <pre>Title:       Dirty Panel Extender (ASP.NET AJAX)
 Author:      Daniel Doubrovkine
 Email:       dblock@dblock.org
 Member ID:   913212
 Language:    C#, ASP.NET 2.0, Microsoft AJAX 1.0
 Platform:    Windows, .NET 2.0
-Technology:  ASP.NET
+Technology:  ASP.NET AJAX
 Level:       Intermediate
 Description: A dirty panel extender implementation with ASP.NET AJAX control toolkit.
 Section      Suggest a section...
 SubSection   Suggest a subsection...
 </pre>
-
-<!-------------------------------     STEP 2      --------------------------->
-<!--  Include download and sample image information.                       --> 
-
-<ul class=download>
-<li><a href="aspnetajaxpanelextender_demo.zip">Download demo project - XXX Kb </a></li>
-<li><a href="aspnetajaxpanelextender_src.zip">Download source - XXX Kb</a></li>
-</ul>
-
-<p><img src="Article.gif" alt="Sample Image - maximum width is 600 pixels" width=400 height=200></p>
-
-
-<!-------------------------------     STEP 3      --------------------------->
-<!--  Add the article text. Please use simple formatting (<h2>, <p> etc)   --> 
-
-<h2>Introduction</h2>
-
-<p>What the article/code snippet does, why it's useful, the problem it solves etc.
-
-<h2>Background (optional)</h2>
-
-<p>Is there any background to this article that may be useful such as an introduction
-to the basic ideas presented?
-
-<h2>Using the code</h2>
-
-<p>A brief desciption of how to use the article or code. The class names, the
-methods and properties, any tricks or tips.
-
-<p>Blocks of code should be wrapped in &lt;pre> tags like this:
-
-<pre>
-//
-// Any source code blocks look like this
-//
+ <ul class="download">
+  <li><a href="http://code.dblock.org/DirtyPanel/">See Live Demo</a></li>
+  <li><a href="aspnetajaxdirtypanelextender.zip">Download source - XXX Kb</a></li>
+ </ul>
+ <p>
+  <img src="aspnetajaxdirtypanelextender/screenshot.jpg" alt="ASP.NET Ajax Dirty Panel Extender in Action"></p>
+ <h2>
+  Introduction
+ </h2>
+ <p>
+  <a href="http://www.foodcandy.com" target="_blank">My website</a> is a rich social
+  network that offers users many web forms to fill. For example, users can post articles
+  and edit lengthy profiles. Often they click on a link that takes them away from
+  the page or press the wrong key (eg. backspace that navigates to the previous page).
+  In both cases their changes get lost. And it is always frustrating to have to re-enter
+  the same text twice. Wouldn't it be nice to warn the user that he has unsaved data
+  and give him an opportunity to cancel, then save his data?
+ </p>
+ <p>
+  This is a Panel Extender for ASP.NET AJAX 1.0 that automatically detects if any
+  input control inside it was changed and shows an alert if the user tries to leave
+  the page before saving the data.
+ </p>
+ <h2>
+  Background
+ </h2>
+ <p>
+  This article uses the same techniques as described in <a href="http://www.codeproject.com/Ajax/AJAXdirty-panel.asp">
+   this prior AJAX DirtyPanel article</a>, but implemented as a panel extender for
+  <a href="http://www.asp.net/ajax/" target="_blank">Microsoft ASP.NET AJAX 1.0</a>.
+  The extender model offers a very clean and straightforward solution described in
+  the implementation section below.
+ </p>
+ <h2>
+  Using the code
+ </h2>
+ <p>
+  Assuming you have an <a href="http://www.asp.net/ajax/" target="_blank">ASP.NET AJAX</a>
+  enabled site that uses the <a href="http://www.asp.net/ajax/control-toolkit/" target="_blank">
+   Ajax Control Toolkit</a>, simply add the DirtyPanelExtender project to your solution,
+  register the extender on the .aspx page and add an extender to a panel.
+  <pre>
+ &lt;%@ register assembly="DirtyPanelExtender" namespace="DirtyPanelExtender" tagprefix="dp" %&gt;
+ ...
+ &lt;dp:dirtypanelextender id="demoPanelExtender" runat="server" targetcontrolid="demoPanel"
+  onleavemessage="There's still unsaved data on the page!" /&gt;
+ &lt;asp:updatepanel id="demoPanel" runat="server"&gt;
+ ...
 </pre>
-
-<p>Variable or class names should be wrapped in &lt;code> tags like <code>this</code>.
-
-<h2>Points of Interest</h2>
-
-<p>Did you learn anything interesting/fun/annoying while writing the code? Did you
-do anything particularly clever or wild or zany?
-
-<h2>History</h2>
-
-<p>Keep a running update of any changes or improvements you've made here.
-
-
-<!-------------------------------    That's it!   --------------------------->
+ </p>
+ <h2>
+  Implementation
+ </h2>
+ <h3>
+  Creating a Basic Extender</h3>
+ <p>
+  Creating an extender skeleton is described in <a href="http://www.asp.net/ajax/control-toolkit/live/Walkthrough/CreatingNewExtender.aspx">
+   this walkthrough</a>. The basics include:
+  <ul>
+   <li><b>DirtyPanelExtenderBehavior.js</b>: all client-side script logic</li>
+   <li><b>DirtyPanelExtender.cs</b>: server-side control implementation</li>
+   <li><b>DirtyPanelExtenderDesigner.cs</b>: design-time functionality</li>
+  </ul>
+ </p>
+ <h3>
+  Hooking window.onbeforeunload
+ </h3>
+ <p>
+  The <code>window.onbeforeunload</code> callback is the essential hook that will
+  trap closing of the window. It is possible to prompt the user before the window
+  is unloaded.
+  <pre>
+window.onbeforeunload = function (eventargs) 
+{
+  if(! eventargs) eventargs = window.event;
+  eventargs.returnValue = "You have unsaved data. Are you sure you want to close this window?"
+}
+</pre>
+  See <a href="http://msdn2.microsoft.com/en-us/library/ms536907.aspx" target="_blank">
+   MSDN</a> for detailed information about the <code>window.onbeforeunload</code>
+  handler.
+ </p>
+ <h3>
+  Multiple DirtyPanels
+ </h3>
+ <p>
+  The implementation supports multiple dirty panels by creating an array of panels.
+  <pre>
+var DirtyPanelExtender_dirtypanels = new Array()
+</pre>
+  The panel initialization code that will add itself to this array.
+  <pre>
+initialize : function() {        
+ DirtyPanelExtender.DirtyPanelExtenderBehavior.callBaseMethod(this, 'initialize');
+ DirtyPanelExtender_dirtypanels[DirtyPanelExtender_dirtypanels.length] = this;
+}
+</pre>
+  It is now possible to iterate through the array in JavaScript.
+  <pre>
+for (i in DirtyPanelExtender_dirtypanels)
+{
+ var panel = DirtyPanelExtender_dirtypanels[i];
+ ...
+}
+</pre>
+ </p>
+ <h3>
+  Hooking window.onbeforeunload for Dirty Panels
+ </h3>
+ <p>
+  Every panel will expose a <code>panel.isDirty</code> that will return true if any
+  of the existing form fields has changed (making the panel "dirty"), plus an <code>
+   OnLeaveMessage</code> property to store the message to show. The hooking will only
+  need to happen for a dirty panel.
+  <pre>
+window.onbeforeunload = function (eventargs) 
+{
+ for (i in DirtyPanelExtender_dirtypanels)
+ {
+  var panel = DirtyPanelExtender_dirtypanels[i];
+  if (panel.isDirty()) 
+  {
+   if(! eventargs) eventargs = window.event;
+   eventargs.returnValue = panel.get_OnLeaveMessage();
+   break;
+  }
+ }
+}
+ </pre>
+ </p>
+ <h3>
+  Determining Whether a Panel is Dirty
+ </h3>
+ <p>
+  Determining whether the panel is dirty is the hardest part. First, there's no native
+  support for whether an input box or other editable control has changed. Old values
+  must be tracked and compared. Original values are saved in a hidden field in <code>
+   OnPreRender</code>
+  <pre>
+protected override void OnPreRender(EventArgs e)
+{
+ ScriptManager.RegisterHiddenField(this, string.Format("{0}_Values", TargetControlID), 
+  String.Join(",", GetValuesArray()));
+ base.OnPreRender(e);
+}
+ </pre>
+  The implementation of <code>GetValuesArray</code> simply iterates through child
+  controls and saves those that are editable.
+ </p>
+ <p>
+  Note that it now looks trivial to implement a way to reset the dirty flag, for example
+  when the user presses the <b>Save</b> button. It is only necessary to reset the
+  saved values. Unfortunately things are not that simple, especially if the exntender
+  is used with an <code>UpdatePanel</code>. You must emit JavaScript within that panel
+  that will reset the value of the hidden field.
+  <pre>
+public void ResetDirtyFlag()
+{
+ ScriptManager.RegisterClientScriptBlock(TargetControl, TargetControl.GetType(), 
+  string.Format("{0}_Values_Update", TargetControlID), string.Format("document.getElementById('{0}').value = '{1}';",
+   string.Format("{0}_Values", TargetControlID), String.Join(",", GetValuesArray())), true);
+}
+ </pre>
+ </p>
+ <p>
+  The <code>isDirty</code> function deconstructs the hidden field value and compares
+  the current form values one-by-one.
+  <pre>
+isDirty : function() {
+ var values_control = document.getElementById(this.get_element().id + "_Values");
+ var values = values_control["value"].split(",");
+ for (i in values) {
+  var namevalue = values[i];
+  var namevaluepair = namevalue.split(":");
+  var name = namevaluepair[0];
+  var value = (namevaluepair.length > 1 ? namevaluepair[1] : "");
+  var control = document.getElementById(name);
+  if (control == null) continue;
+  // bug: doesn't work for RadioButtonList
+  if (control.type == 'checkbox' || control.type == 'radio') {
+      var boolvalue = (value == "true" ? true : false);
+      if(control.checked != boolvalue) {
+          return true;
+      }
+  } else if (control.type == 'select-one') {
+      if(control.selectedIndex != value) {
+          return true;
+      }
+  } else {
+      if(control.value != value) {
+          return true;
+      }
+  }
+ }
+ return false;
+}
+ </pre>
+ </p>
+ <h2>
+  Conclusion
+ </h2>
+ This is a simple and useful control. I also found the ASP.NET AJAX extender model
+ very well structured and clean, adding useful functionality to existing controls
+ in a straightforward manner, a significant improvement over <a href="http://www.codeproject.com/Ajax/AJAXdirty-panel.asp">
+  the reference AJAX implementation for Anthem</a>.
+ <h2>
+  History
+ </h2>
+ <p>
+  <ul>
+   <li>Initial version: 08/10/2007</li>
+  </ul>
+ </p>
 </body>
 </html>

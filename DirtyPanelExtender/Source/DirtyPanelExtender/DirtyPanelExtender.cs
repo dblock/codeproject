@@ -14,7 +14,8 @@ namespace DirtyPanelExtender
     [Designer(typeof(DirtyPanelExtenderDesigner))]
     [ClientScriptResource("DirtyPanelExtender.DirtyPanelExtenderBehavior", "DirtyPanelExtender.DirtyPanelExtenderBehavior.js")]
     [TargetControlType(typeof(Panel))]
-    public class DirtyPanelExtender: ExtenderControlBase
+    [TargetControlType(typeof(UpdatePanel))]
+    public class DirtyPanelExtender : ExtenderControlBase
     {
         [ExtenderControlProperty]
         [DefaultValue("Data has not been saved.")]
@@ -34,26 +35,6 @@ namespace DirtyPanelExtender
         {
             ScriptManager.RegisterHiddenField(this, string.Format("{0}_Values", TargetControlID), String.Join(",", GetValuesArray()));
             base.OnPreRender(e);
-        }
-
-        private string[] GetControlsArray()
-        {
-            return GetControlsArray(TargetControl.Controls);
-        }
-
-        private string[] GetControlsArray(ControlCollection coll)
-        {
-            List<string> controls = new List<string>();
-            foreach (Control control in coll)
-            {
-                if (control is IEditableTextControl || control is ICheckBoxControl)
-                {
-                    controls.Add(control.ClientID);
-                }
-                
-                controls.AddRange(GetControlsArray(control.Controls));
-            }
-            return controls.ToArray();
         }
 
         private string[] GetValuesArray()
@@ -82,6 +63,13 @@ namespace DirtyPanelExtender
                 values.AddRange(GetValuesArray(control.Controls));
             }
             return values.ToArray();
+        }
+
+        public void ResetDirtyFlag()
+        {
+            ScriptManager.RegisterClientScriptBlock(TargetControl, TargetControl.GetType(), 
+                string.Format("{0}_Values_Update", TargetControlID), string.Format("document.getElementById('{0}').value = '{1}';",
+                    string.Format("{0}_Values", TargetControlID), String.Join(",", GetValuesArray())), true);
         }
     }
 }
