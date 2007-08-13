@@ -59,6 +59,21 @@ DirtyPanelExtender.DirtyPanelExtenderBehavior.registerClass('DirtyPanelExtender.
 
 var DirtyPanelExtender_dirtypanels = new Array()
 
+function DirtyPanelExtender_SuppressDirtyCheck()
+{
+  window.onbeforeunload = null;
+}
+
+function __newDoPostBack(eventTarget, eventArgument) 
+{ 
+  // supress prompting on postback
+  DirtyPanelExtender_SuppressDirtyCheck();
+  return __savedDoPostBack (eventTarget, eventArgument);
+}
+
+var __savedDoPostBack = __doPostBack;
+__doPostBack = __newDoPostBack; 
+
 window.onbeforeunload = function (eventargs) 
 {
     for (i in DirtyPanelExtender_dirtypanels)

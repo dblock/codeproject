@@ -33,7 +33,9 @@ namespace DirtyPanelExtender
 
         protected override void OnPreRender(EventArgs e)
         {
-            ScriptManager.RegisterHiddenField(this, string.Format("{0}_Values", TargetControlID), String.Join(",", GetValuesArray()));
+            string values_id = string.Format("{0}_Values", TargetControl.ClientID);
+            string values = (Page.IsPostBack ? Page.Request.Form[values_id] : String.Join(",", GetValuesArray()));
+            ScriptManager.RegisterHiddenField(this, values_id, values);
             base.OnPreRender(e);
         }
 
@@ -68,8 +70,8 @@ namespace DirtyPanelExtender
         public void ResetDirtyFlag()
         {
             ScriptManager.RegisterClientScriptBlock(TargetControl, TargetControl.GetType(), 
-                string.Format("{0}_Values_Update", TargetControlID), string.Format("document.getElementById('{0}').value = '{1}';",
-                    string.Format("{0}_Values", TargetControlID), String.Join(",", GetValuesArray())), true);
+                string.Format("{0}_Values_Update", TargetControl.ClientID), string.Format("document.getElementById('{0}').value = '{1}';",
+                    string.Format("{0}_Values", TargetControl.ClientID), String.Join(",", GetValuesArray())), true);
         }
     }
 }

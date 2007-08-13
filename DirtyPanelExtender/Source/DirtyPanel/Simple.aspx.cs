@@ -11,11 +11,17 @@ using System.Web.UI.HtmlControls;
 
 namespace DirtyPanel
 {
-    public partial class _Default : System.Web.UI.Page
+    public partial class _Simple : System.Web.UI.Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {
 
+        }
+
+        public void save_Click(object sender, EventArgs e)
+        {
+            demoPanelExtender.ResetDirtyFlag();
+            lastsaved.Text = DateTime.Now.ToString();
         }
     }
 }

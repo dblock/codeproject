@@ -30,11 +30,13 @@ SubSection   Suggest a subsection...
 </pre>
  <ul class="download">
   <li><a href="http://code.dblock.org/DirtyPanel/">See live demo</a></li>
-  <li><a href="DirtyPanelExtenderSource.zip">Download source - 279 Kb</a></li>
-  <li><a href="DirtyPanelExtenderBinaries.zip">Download binaries &amp; demo website - 435 Kb</a></li>
+  <li><a href="ajaxdirtypanelextender/DirtyPanelExtenderSource.zip">Download source
+   - 279 Kb</a></li>
+  <li><a href="ajaxdirtypanelextender/DirtyPanelExtenderBinaries.zip">Download binaries
+   &amp; demo website - 435 Kb</a></li>
  </ul>
  <p>
-  <img src="screenshot.jpg" alt="ASP.NET Ajax Dirty Panel Extender in Action"></p>
+  <img src="ajaxdirtypanelextender/screenshot.jpg" width="500" height="321" alt="ASP.NET Ajax Dirty Panel Extender in Action"></p>
  <h2>
   Introduction
  </h2>
@@ -63,22 +65,44 @@ SubSection   Suggest a subsection...
   the implementation section below.
  </p>
  <h2>
-  Using the code
+  Using the Code
  </h2>
+ <h3>
+  Standard Pages
+ </h3>
  <p>
   Assuming you have an <a href="http://www.asp.net/ajax/" target="_blank">ASP.NET AJAX</a>
   enabled site that uses the <a href="http://www.asp.net/ajax/control-toolkit/" target="_blank">
    Ajax Control Toolkit</a>, simply add the DirtyPanelExtender project to your solution,
   register the extender on the .aspx page and add an extender to a panel.
-  <pre>
- &lt;%@ register assembly="DirtyPanelExtender" namespace="DirtyPanelExtender" tagprefix="dp" %&gt;
+  <pre> &lt;%@ register assembly="DirtyPanelExtender" namespace="DirtyPanelExtender" tagprefix="dp" %&gt;
  ...
- &lt;dp:dirtypanelextender id="demoPanelExtender" runat="server" targetcontrolid="demoPanel"
-  onleavemessage="There's still unsaved data on the page!" /&gt;
- &lt;asp:updatepanel id="demoPanel" runat="server"&gt;
+ &lt;dp:DirtyPaneleEtender id="demoPanelExtender" runat="server" targetcontrolid="demoPanel"
+  OnLeaveMessage="There's still unsaved data on the page!" /&gt;
+ &lt;asp:UpdatePanel id="demoPanel" runat="server"&gt;
  ...
 </pre>
  </p>
+ <h3>
+  Master Pages
+ </h3>
+ <p>
+  The master page scenario enables all website pages to enable the dirty panel feature automatically.
+  You must wrap the ContentPlaceHolder in a panel and extend the panel with the DirtyPanelExtender.
+ </p>
+ <pre>
+&lt;form id="form1" runat="server"&gt;
+ &lt;asp:ScriptManager ID="ScriptManager1" runat="server" /&gt;
+ <b>&lt;dp:DirtyPanelExtender ID="demoPanelExtender" runat="server" TargetControlID="masterPanel"
+  OnLeaveMessage="There's still unsaved data on the page!" /&gt;</b>
+ &lt;asp:UpdatePanel ID="<b>masterPanel</b>" runat="server"&gt;
+ &lt;ContentTemplate&gt;
+  &lt;asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server"&gt;
+  &lt;/asp:ContentPlaceHolder&gt;
+ &lt;/ContentTemplate&gt;
+ &lt;/asp:UpdatePanel&gt;
+&lt;/form&gt;
+ </pre>
  <h2>
   Implementation
  </h2>
@@ -87,12 +111,12 @@ SubSection   Suggest a subsection...
  <p>
   Creating an extender skeleton is described in <a href="http://www.asp.net/ajax/control-toolkit/live/Walkthrough/CreatingNewExtender.aspx">
    this walkthrough</a>. The basics include:
-  <ul>
-   <li><b>DirtyPanelExtenderBehavior.js</b>: all client-side script logic</li>
-   <li><b>DirtyPanelExtender.cs</b>: server-side control implementation</li>
-   <li><b>DirtyPanelExtenderDesigner.cs</b>: design-time functionality</li>
-  </ul>
  </p>
+ <ul>
+  <li><b>DirtyPanelExtenderBehavior.js</b>: all client-side script logic</li>
+  <li><b>DirtyPanelExtender.cs</b>: server-side control implementation</li>
+  <li><b>DirtyPanelExtenderDesigner.cs</b>: design-time functionality</li>
+ </ul>
  <h3>
   Hooking window.onbeforeunload
  </h3>
@@ -100,41 +124,38 @@ SubSection   Suggest a subsection...
   The <code>window.onbeforeunload</code> callback is the essential hook that will
   trap closing of the window. It is possible to prompt the user before the window
   is unloaded.
-  <pre>
-window.onbeforeunload = function (eventargs) 
+ </p>
+ <pre>window.onbeforeunload = function (eventargs) 
 {
   if(! eventargs) eventargs = window.event;
   eventargs.returnValue = "You have unsaved data. Are you sure you want to close this window?"
 }
 </pre>
-  See <a href="http://msdn2.microsoft.com/en-us/library/ms536907.aspx" target="_blank">
-   MSDN</a> for detailed information about the <code>window.onbeforeunload</code>
-  handler.
- </p>
+ See <a href="http://msdn2.microsoft.com/en-us/library/ms536907.aspx" target="_blank">
+  MSDN</a> for detailed information about the <code>window.onbeforeunload</code>
+ handler.
  <h3>
   Multiple DirtyPanels
  </h3>
  <p>
   The implementation supports multiple dirty panels by creating an array of panels.
-  <pre>
-var DirtyPanelExtender_dirtypanels = new Array()
+ </p>
+ <pre> var DirtyPanelExtender_dirtypanels = new Array()
 </pre>
-  The panel initialization code that will add itself to this array.
-  <pre>
-initialize : function() {        
+ <br />
+ The panel initialization code that will add itself to this array.
+ <pre>initialize : function() {        
  DirtyPanelExtender.DirtyPanelExtenderBehavior.callBaseMethod(this, 'initialize');
  DirtyPanelExtender_dirtypanels[DirtyPanelExtender_dirtypanels.length] = this;
 }
 </pre>
-  It is now possible to iterate through the array in JavaScript.
-  <pre>
+ It is now possible to iterate through the array in JavaScript.
+ <pre>
 for (i in DirtyPanelExtender_dirtypanels)
 {
  var panel = DirtyPanelExtender_dirtypanels[i];
  ...
-}
-</pre>
- </p>
+}</pre>
  <h3>
   Hooking window.onbeforeunload for Dirty Panels
  </h3>
@@ -143,8 +164,8 @@ for (i in DirtyPanelExtender_dirtypanels)
   of the existing form fields has changed (making the panel "dirty"), plus an <code>
    OnLeaveMessage</code> property to store the message to show. The hooking will only
   need to happen for a dirty panel.
-  <pre>
-window.onbeforeunload = function (eventargs) 
+ </p>
+ <pre>window.onbeforeunload = function (eventargs) 
 {
  for (i in DirtyPanelExtender_dirtypanels)
  {
@@ -158,46 +179,64 @@ window.onbeforeunload = function (eventargs)
  }
 }
  </pre>
+ <h3>
+  Suppressing Dirty Check for Postbacks
+ </h3>
+ <p>
+  The dirty panel only needs to trap navigating away from the page and not regular
+  AJAX interaction built into the page. This notably enables upload controls without
+  an UpdatePanel.
  </p>
+ <pre>
+function __newDoPostBack(eventTarget, eventArgument) 
+{ 
+// supress prompting on postback
+window.onbeforeunload = null;
+return __savedDoPostBack (eventTarget, eventArgument);
+}
+
+var __savedDoPostBack = __doPostBack;
+__doPostBack = __newDoPostBack;  
+ </pre>
  <h3>
   Determining Whether a Panel is Dirty
  </h3>
  <p>
   Determining whether the panel is dirty is the hardest part. First, there's no native
   support for whether an input box or other editable control has changed. Old values
-  must be tracked and compared. Original values are saved in a hidden field in <code>
-   OnPreRender</code>
-  <pre>
+  must be tracked and compared. In addition, hidden values should not be updated on
+  a regular postback. Original values are saved in a hidden field in <code>OnPreRender</code>
+ </p>
+ <pre>
 protected override void OnPreRender(EventArgs e)
 {
- ScriptManager.RegisterHiddenField(this, string.Format("{0}_Values", TargetControlID), 
-  String.Join(",", GetValuesArray()));
+ string values_id = string.Format("{0}_Values", TargetControl.ClientID);
+ string values = (Page.IsPostBack ? Page.Request.Form[values_id] : String.Join(",", GetValuesArray()));
+ ScriptManager.RegisterHiddenField(this, values_id, values);
  base.OnPreRender(e);
 }
  </pre>
-  The implementation of <code>GetValuesArray</code> simply iterates through child
-  controls and saves those that are editable.
- </p>
+ The implementation of <code>GetValuesArray</code> simply iterates through child
+ controls and saves those that are editable.
  <p>
   Note that it now looks trivial to implement a way to reset the dirty flag, for example
   when the user presses the <b>Save</b> button. It is only necessary to reset the
   saved values. Unfortunately things are not that simple, especially if the exntender
   is used with an <code>UpdatePanel</code>. You must emit JavaScript within that panel
   that will reset the value of the hidden field.
-  <pre>
-public void ResetDirtyFlag()
+ </p>
+ <pre>public void ResetDirtyFlag()
 {
  ScriptManager.RegisterClientScriptBlock(TargetControl, TargetControl.GetType(), 
-  string.Format("{0}_Values_Update", TargetControlID), string.Format("document.getElementById('{0}').value = '{1}';",
-   string.Format("{0}_Values", TargetControlID), String.Join(",", GetValuesArray())), true);
+  string.Format("{0}_Values_Update", TargetControl.ClientID), string.Format("document.getElementById('{0}').value = '{1}';",
+   string.Format("{0}_Values", TargetControl.ClientID), String.Join(",", GetValuesArray())), true);
 }
  </pre>
- </p>
  <p>
   The <code>isDirty</code> function deconstructs the hidden field value and compares
   the current form values one-by-one.
-  <pre>
-isDirty : function() {
+ </p>
+ <pre>isDirty : function() {
  var values_control = document.getElementById(this.get_element().id + "_Values");
  var values = values_control["value"].split(",");
  for (i in values) {
@@ -226,7 +265,6 @@ isDirty : function() {
  return false;
 }
  </pre>
- </p>
  <h2>
   Conclusion
  </h2>
@@ -235,11 +273,24 @@ isDirty : function() {
  in a straightforward manner, a significant improvement over <a href="http://www.codeproject.com/Ajax/AJAXdirty-panel.asp">
   the reference AJAX implementation for Anthem</a>.
  <h2>
+  Known Issues
+ </h2>
+ <p>
+  <ul>
+   <li>doesn't work with radio buttons</li>
+   <li>doesn't work with Opera; tested with Opera 9.21</li>
+   <li>doesn't work with Safari; tested with 3.0.2 WinXP</li>
+  </ul>
+ </p>
+ <h2>
   History
  </h2>
  <p>
   <ul>
-   <li>Initial version: 08/10/2007</li>
+   <li>08/10/2007: initial version</li>
+   <li>08/11/2007: fixed bug - target control client ID wrong</li>
+   <li>08/11/2007: fixed bug - fixed for upload controls and standard AJAX scenarios; suppressed prompting for all postbacks</li>
+   <li>08/13/2007: added demo and documentation for using the extender with master pages</li>
   </ul>
  </p>
 </body>
