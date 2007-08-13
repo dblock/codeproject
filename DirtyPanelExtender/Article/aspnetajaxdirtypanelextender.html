@@ -75,7 +75,7 @@ SubSection   Suggest a subsection...
   enabled site that uses the <a href="http://www.asp.net/ajax/control-toolkit/" target="_blank">
    Ajax Control Toolkit</a>, simply add the DirtyPanelExtender project to your solution,
   register the extender on the .aspx page and add an extender to a panel.
-  <pre> &lt;%@ register assembly="DirtyPanelExtender" namespace="DirtyPanelExtender" tagprefix="dp" %&gt;
+  <pre lang="cs"> &lt;%@ register assembly="DirtyPanelExtender" namespace="DirtyPanelExtender" tagprefix="dp" %&gt;
  ...
  &lt;dp:DirtyPaneleEtender id="demoPanelExtender" runat="server" targetcontrolid="demoPanel"
   OnLeaveMessage="There's still unsaved data on the page!" /&gt;
@@ -90,7 +90,7 @@ SubSection   Suggest a subsection...
   The master page scenario enables all website pages to enable the dirty panel feature automatically.
   You must wrap the ContentPlaceHolder in a panel and extend the panel with the DirtyPanelExtender.
  </p>
- <pre>
+ <pre lang="cs">
 &lt;form id="form1" runat="server"&gt;
  &lt;asp:ScriptManager ID="ScriptManager1" runat="server" /&gt;
  <b>&lt;dp:DirtyPanelExtender ID="demoPanelExtender" runat="server" TargetControlID="masterPanel"
@@ -125,7 +125,7 @@ SubSection   Suggest a subsection...
   trap closing of the window. It is possible to prompt the user before the window
   is unloaded.
  </p>
- <pre>window.onbeforeunload = function (eventargs) 
+ <pre lang="jscript">window.onbeforeunload = function (eventargs) 
 {
   if(! eventargs) eventargs = window.event;
   eventargs.returnValue = "You have unsaved data. Are you sure you want to close this window?"
@@ -140,17 +140,17 @@ SubSection   Suggest a subsection...
  <p>
   The implementation supports multiple dirty panels by creating an array of panels.
  </p>
- <pre> var DirtyPanelExtender_dirtypanels = new Array()
+ <pre lang="jscript"> var DirtyPanelExtender_dirtypanels = new Array()
 </pre>
  <br />
  The panel initialization code that will add itself to this array.
- <pre>initialize : function() {        
+ <pre lang="jscript">initialize : function() {        
  DirtyPanelExtender.DirtyPanelExtenderBehavior.callBaseMethod(this, 'initialize');
  DirtyPanelExtender_dirtypanels[DirtyPanelExtender_dirtypanels.length] = this;
 }
 </pre>
  It is now possible to iterate through the array in JavaScript.
- <pre>
+ <pre lang="jscript">
 for (i in DirtyPanelExtender_dirtypanels)
 {
  var panel = DirtyPanelExtender_dirtypanels[i];
@@ -165,7 +165,7 @@ for (i in DirtyPanelExtender_dirtypanels)
    OnLeaveMessage</code> property to store the message to show. The hooking will only
   need to happen for a dirty panel.
  </p>
- <pre>window.onbeforeunload = function (eventargs) 
+ <pre lang="jscript">window.onbeforeunload = function (eventargs) 
 {
  for (i in DirtyPanelExtender_dirtypanels)
  {
@@ -187,7 +187,7 @@ for (i in DirtyPanelExtender_dirtypanels)
   AJAX interaction built into the page. This notably enables upload controls without
   an UpdatePanel.
  </p>
- <pre>
+ <pre lang="jscript">
 function __newDoPostBack(eventTarget, eventArgument) 
 { 
 // supress prompting on postback
@@ -207,7 +207,7 @@ __doPostBack = __newDoPostBack;
   must be tracked and compared. In addition, hidden values should not be updated on
   a regular postback. Original values are saved in a hidden field in <code>OnPreRender</code>
  </p>
- <pre>
+ <pre lang="cs">
 protected override void OnPreRender(EventArgs e)
 {
  string values_id = string.Format("{0}_Values", TargetControl.ClientID);
@@ -225,7 +225,7 @@ protected override void OnPreRender(EventArgs e)
   is used with an <code>UpdatePanel</code>. You must emit JavaScript within that panel
   that will reset the value of the hidden field.
  </p>
- <pre>public void ResetDirtyFlag()
+ <pre lang="cs">public void ResetDirtyFlag()
 {
  ScriptManager.RegisterClientScriptBlock(TargetControl, TargetControl.GetType(), 
   string.Format("{0}_Values_Update", TargetControl.ClientID), string.Format("document.getElementById('{0}').value = '{1}';",
@@ -236,7 +236,7 @@ protected override void OnPreRender(EventArgs e)
   The <code>isDirty</code> function deconstructs the hidden field value and compares
   the current form values one-by-one.
  </p>
- <pre>isDirty : function() {
+ <pre lang="jscript">isDirty : function() {
  var values_control = document.getElementById(this.get_element().id + "_Values");
  var values = values_control["value"].split(",");
  for (i in values) {
