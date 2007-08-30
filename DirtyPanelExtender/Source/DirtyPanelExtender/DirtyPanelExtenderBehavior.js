@@ -18,18 +18,28 @@ DirtyPanelExtender.DirtyPanelExtenderBehavior.prototype = {
             var value = (namevaluepair.length > 1 ? namevaluepair[1] : "");
             var control = document.getElementById(name);
             if (control == null) continue;
-            // bug: doesn't work for RadioButtonList
+            alert(control.type);
             if (control.type == 'checkbox' || control.type == 'radio') {
                 var boolvalue = (value == "true" ? true : false);
                 if(control.checked != boolvalue) {
                     return true;
                 }
             } else if (control.type == 'select-one') {
-                if(control.selectedIndex != value) {
-                    return true;
-                }
+               if ( control.size > 0 ){
+                   // control is listbox
+                   var optionValues = "";
+                   // concat all listbox items
+                   for( var cnt = 0; cnt < control.options.length; cnt++){
+                       optionValues += control.options[cnt].text;
+                   }
+                   if( encodeURIComponent(optionValues) != value ){
+                       return true;
+                   }
+               } else if(control.selectedIndex != value) {
+                 return true;
+               }
             } else {
-                if(control.value != value) {
+                if(encodeURIComponent(control.value) != value) {
                     return true;
                 }
             }

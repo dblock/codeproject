@@ -29,15 +29,20 @@
       <asp:ListItem Text="third" />
      </asp:DropDownList>
     </p>
-    <!--
-     <p>
-      <asp:RadioButtonList ID="demoRadio" runat="server">
-       <asp:ListItem Selected="true" Text="first" />
-       <asp:ListItem Text="second" />
-       <asp:ListItem Text="third" />
-      </asp:RadioButtonList>   
-     </p>
-     -->
+    <p>
+     <asp:RadioButtonList ID="demoRadio" runat="server">
+      <asp:ListItem Selected="true" Text="first" />
+      <asp:ListItem Text="second" />
+      <asp:ListItem Text="third" />
+     </asp:RadioButtonList>
+    </p>
+    <p>
+     <asp:ListBox ID="demoListBox" runat="server">
+      <asp:ListItem Selected="true" Text="first" />
+      <asp:ListItem Text="second" />
+      <asp:ListItem Text="third" />
+     </asp:ListBox>
+    </p>
     <p>
      Enter Text:
      <br />

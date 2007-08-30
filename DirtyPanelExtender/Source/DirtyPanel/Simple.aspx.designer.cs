@@ -83,6 +83,15 @@ namespace DirtyPanel {
         protected global::System.Web.UI.WebControls.RadioButtonList demoRadio;
         
         /// <summary>
+        /// demoListBox control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox demoListBox;
+        
+        /// <summary>
         /// demoTextBox control.
         /// </summary>
         /// <remarks>
