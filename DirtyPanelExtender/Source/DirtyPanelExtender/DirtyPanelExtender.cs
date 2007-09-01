@@ -62,12 +62,15 @@ namespace DirtyPanelExtender
                 }
                 else if (control is ListBox)
                 {
-                    StringBuilder sb = new StringBuilder();
+                    StringBuilder data = new StringBuilder();
+                    StringBuilder selection = new StringBuilder();
                     foreach (ListItem item in ((ListBox) control).Items)
                     {
-                        sb.Append(item.Text);
+                        data.AppendLine(item.Text);
+                        selection.AppendLine(item.Selected.ToString().ToLower());
                     }
-                    values.Add(string.Format("{0}:{1}", control.ClientID, Uri.EscapeDataString(sb.ToString())));
+                    values.Add(string.Format("{0}:data:{1}", control.ClientID, Uri.EscapeDataString(data.ToString())));
+                    values.Add(string.Format("{0}:selection:{1}", control.ClientID, Uri.EscapeDataString(selection.ToString())));
                 }
                 else if (control is IEditableTextControl)
                 {

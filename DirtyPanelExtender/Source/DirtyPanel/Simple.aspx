@@ -44,6 +44,13 @@
      </asp:ListBox>
     </p>
     <p>
+     <asp:ListBox ID="demoListBoxMultiple" SelectionMode="Multiple" runat="server">
+      <asp:ListItem Selected="true" Text="first" />
+      <asp:ListItem Text="second" />
+      <asp:ListItem Selected="true" Text="third" />
+     </asp:ListBox>
+    </p>
+    <p>
      Enter Text:
      <br />
      <asp:TextBox ID="demoTextBox" runat="server" TextMode="MultiLine" Rows="5" />

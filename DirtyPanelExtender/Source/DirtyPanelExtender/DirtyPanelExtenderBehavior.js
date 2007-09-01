@@ -18,28 +18,42 @@ DirtyPanelExtender.DirtyPanelExtenderBehavior.prototype = {
             var value = (namevaluepair.length > 1 ? namevaluepair[1] : "");
             var control = document.getElementById(name);
             if (control == null) continue;
-            alert(control.type);
             if (control.type == 'checkbox' || control.type == 'radio') {
                 var boolvalue = (value == "true" ? true : false);
                 if(control.checked != boolvalue) {
+                    // alert("checkbox changed: " + control.checked + " vs. " + boolvalue);
                     return true;
                 }
-            } else if (control.type == 'select-one') {
-               if ( control.size > 0 ){
-                   // control is listbox
-                   var optionValues = "";
-                   // concat all listbox items
-                   for( var cnt = 0; cnt < control.options.length; cnt++){
-                       optionValues += control.options[cnt].text;
-                   }
-                   if( encodeURIComponent(optionValues) != value ){
-                       return true;
+            } else if (control.type == 'select-one' || control.type == 'select-multiple') {
+               if (namevaluepair.length > 2) {
+                   if ( control.size > 0) {
+                       // control is listbox
+                       // there's data:value and selection:value
+                       var code = value;
+                       value = (namevaluepair.length > 2 ? namevaluepair[2] : "");
+                       var optionValues = "";
+                       // concat all listbox items
+                       for( var cnt = 0; cnt < control.options.length; cnt++) {
+                          if (code == 'data') {
+                              optionValues += control.options[cnt].text;
+                          } else if (code == 'selection') {
+                              optionValues += control.options[cnt].selected;
+                          }
+                          optionValues += "\r\n";
+                       }
+                       if( encodeURIComponent(optionValues) != value ) {
+                          // items in the listbox have changed
+                          // alert("listbox " + code + " changed: " + encodeURIComponent(optionValues) + " vs. " + value);
+                          return true;
+                       }
                    }
                } else if(control.selectedIndex != value) {
-                 return true;
+                   // alert("dropdown selection changed: " + control.selectedIndex + " vs. " + value);
+                   return true;
                }
             } else {
                 if(encodeURIComponent(control.value) != value) {
+                    // alert("control " + control.type + " changed: " + control.value + " vs. " + value);
                     return true;
                 }
             }

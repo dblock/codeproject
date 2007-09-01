@@ -222,7 +222,7 @@ protected override void OnPreRender(EventArgs e)
   <ul>
    <li><b>DropDownList</b>: save the selected index</li>
    <li><b>RadioButtonList</b>: save an entry for each radio button with its selected state</li>
-   <li><b>ListBox</b>: save each listbox item</li>
+   <li><b>ListBox</b>: save each listbox item selection and data</li>
    <li><b>IEditableTextControl</b>: save any .Text value of an editable control</li>
    <li><b>ICheckBoxControl</b>: save checkbox state</li>
   </ul>
@@ -255,7 +255,6 @@ protected override void OnPreRender(EventArgs e)
   var value = (namevaluepair.length > 1 ? namevaluepair[1] : "");
   var control = document.getElementById(name);
   if (control == null) continue;
-  alert(control.type);
   if (control.type == 'checkbox' || control.type == 'radio') {
    var boolvalue = (value == "true" ? true : false);
    if(control.checked != boolvalue) {
@@ -264,11 +263,7 @@ protected override void OnPreRender(EventArgs e)
   } else if (control.type == 'select-one') {
    if ( control.size > 0 ){
     // control is listbox
-    var optionValues = "";
-    // concat all listbox items
-    for( var cnt = 0; cnt < control.options.length; cnt++){
-     optionValues += control.options[cnt].text;
-    }
+    ...
     if( encodeURIComponent(optionValues) != value ){
      return true;
     }
@@ -284,6 +279,10 @@ protected override void OnPreRender(EventArgs e)
  return false;
 }
  </pre>
+ <p>
+  The actual implementation of <code>isDirty</code> is a little more complex. It deals with both selection 
+  and data changes in list controls.
+ </p>
  <h2>
   Conclusion
  </h2>
@@ -309,7 +308,7 @@ protected override void OnPreRender(EventArgs e)
    <li>08/11/2007: fixed bug - target control client ID wrong</li>
    <li>08/11/2007: fixed bug - fixed for upload controls and standard AJAX scenarios; suppressed prompting for all postbacks</li>
    <li>08/13/2007: added demo and documentation for using the extender with master pages</li>
-   <li>08/28/2007: added RadioButtonList and ListBox support (credit: pishposh)</li>
+   <li>08/28/2007: added RadioButtonList and ListBox support (thanks to David Christensen)</li>
   </ul>
  </p>
 </body>

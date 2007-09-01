@@ -19,6 +19,15 @@ Project("{2CFEAB61-6A3B-4EB8-B523-560B4BEEF521}") = "DirtyPanelDeploy", "DirtyPa
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AC0D1440-9AF5-4D11-A296-022B8EC3A81B}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		..\Article\aspnetajaxdirtypanelextender.html = ..\Article\aspnetajaxdirtypanelextender.html
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
