@@ -49,22 +49,18 @@ namespace DirtyPanelExtender
             List<string> values = new List<string>();
             foreach (Control control in coll)
             {
-                if (control is DropDownList)
+                if (control is RadioButtonList)
                 {
-                    values.Add(string.Format("{0}:{1}", control.ClientID, ((ListControl)control).SelectedIndex));
-                }
-                else if (control is RadioButtonList)
-                {
-                    for (int i = 0; i < ((RadioButtonList) control).Items.Count; i++)
+                    for (int i = 0; i < ((RadioButtonList)control).Items.Count; i++)
                     {
                         values.Add(string.Format("{0}_{1}:{2}", control.ClientID, i, ((RadioButtonList)control).Items[i].Selected.ToString().ToLower()));
                     }
                 }
-                else if (control is ListBox)
+                else if (control is ListControl)
                 {
                     StringBuilder data = new StringBuilder();
                     StringBuilder selection = new StringBuilder();
-                    foreach (ListItem item in ((ListBox) control).Items)
+                    foreach (ListItem item in ((ListControl) control).Items)
                     {
                         data.AppendLine(item.Text);
                         selection.AppendLine(item.Selected.ToString().ToLower());

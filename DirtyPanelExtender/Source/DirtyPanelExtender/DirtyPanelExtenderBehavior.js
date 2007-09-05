@@ -18,6 +18,7 @@ DirtyPanelExtender.DirtyPanelExtenderBehavior.prototype = {
             var value = (namevaluepair.length > 1 ? namevaluepair[1] : "");
             var control = document.getElementById(name);
             if (control == null) continue;
+            // alert(control.id + " -> " + control.type);
             if (control.type == 'checkbox' || control.type == 'radio') {
                 var boolvalue = (value == "true" ? true : false);
                 if(control.checked != boolvalue) {
@@ -26,7 +27,7 @@ DirtyPanelExtender.DirtyPanelExtenderBehavior.prototype = {
                 }
             } else if (control.type == 'select-one' || control.type == 'select-multiple') {
                if (namevaluepair.length > 2) {
-                   if ( control.size > 0) {
+                   if ( control.options.length > 0) {
                        // control is listbox
                        // there's data:value and selection:value
                        var code = value;

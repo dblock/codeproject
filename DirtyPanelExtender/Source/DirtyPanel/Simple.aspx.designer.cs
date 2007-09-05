@@ -74,6 +74,15 @@ namespace DirtyPanel {
         protected global::System.Web.UI.WebControls.DropDownList demoDropDown;
         
         /// <summary>
+        /// demoDropDownAdd control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button demoDropDownAdd;
+        
+        /// <summary>
         /// demoRadio control.
         /// </summary>
         /// <remarks>
@@ -81,6 +90,15 @@ namespace DirtyPanel {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RadioButtonList demoRadio;
+        
+        /// <summary>
+        /// demoRadioAdd control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button demoRadioAdd;
         
         /// <summary>
         /// demoListBox control.
@@ -92,6 +110,15 @@ namespace DirtyPanel {
         protected global::System.Web.UI.WebControls.ListBox demoListBox;
         
         /// <summary>
+        /// demoListBoxAdd control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button demoListBoxAdd;
+        
+        /// <summary>
         /// demoListBoxMultiple control.
         /// </summary>
         /// <remarks>
@@ -99,6 +126,15 @@ namespace DirtyPanel {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.ListBox demoListBoxMultiple;
+        
+        /// <summary>
+        /// demoListBoxMultipleAdd control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button demoListBoxMultipleAdd;
         
         /// <summary>
         /// demoTextBox control.

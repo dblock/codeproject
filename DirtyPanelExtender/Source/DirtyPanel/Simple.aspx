@@ -28,6 +28,7 @@
       <asp:ListItem Text="second" />
       <asp:ListItem Text="third" />
      </asp:DropDownList>
+     <asp:Button ID="demoDropDownAdd" runat="server" OnClick="demoDropDownAdd_Click" Text="Add" />
     </p>
     <p>
      <asp:RadioButtonList ID="demoRadio" runat="server">
@@ -35,6 +36,8 @@
       <asp:ListItem Text="second" />
       <asp:ListItem Text="third" />
      </asp:RadioButtonList>
+     <asp:Button ID="demoRadioAdd" runat="server" OnClick="demoRadioAdd_Click" Text="Add" />
+     (doesn't work)
     </p>
     <p>
      <asp:ListBox ID="demoListBox" runat="server">
@@ -42,6 +45,7 @@
       <asp:ListItem Text="second" />
       <asp:ListItem Text="third" />
      </asp:ListBox>
+     <asp:Button ID="demoListBoxAdd" runat="server" OnClick="demoListBoxAdd_Click" Text="Add" />
     </p>
     <p>
      <asp:ListBox ID="demoListBoxMultiple" SelectionMode="Multiple" runat="server">
@@ -49,6 +53,8 @@
       <asp:ListItem Text="second" />
       <asp:ListItem Selected="true" Text="third" />
      </asp:ListBox>
+     <asp:Button ID="demoListBoxMultipleAdd" runat="server" OnClick="demoListBoxMultipleAdd_Click"
+      Text="Add" />
     </p>
     <p>
      Enter Text:
