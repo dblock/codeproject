@@ -43,5 +43,10 @@ namespace DirtyPanel
         {
             demoRadio.Items.Add(new ListItem(Guid.NewGuid().ToString()));
         }
+
+        public void demoCheckBoxListAdd_Click(object sneder, EventArgs e)
+        {
+            demoCheckBoxList.Items.Add(new ListItem(Guid.NewGuid().ToString()));
+        }
     }
 }

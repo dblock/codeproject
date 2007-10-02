@@ -101,6 +101,24 @@ namespace DirtyPanel {
         protected global::System.Web.UI.WebControls.Button demoRadioAdd;
         
         /// <summary>
+        /// demoCheckBoxList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList demoCheckBoxList;
+        
+        /// <summary>
+        /// demoCheckBoxListAdd control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button demoCheckBoxListAdd;
+        
+        /// <summary>
         /// demoListBox control.
         /// </summary>
         /// <remarks>

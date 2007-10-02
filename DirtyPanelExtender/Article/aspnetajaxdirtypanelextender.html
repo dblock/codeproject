@@ -246,10 +246,15 @@ protected override void OnPreRender(EventArgs e)
 }
  </pre>
  <p>
-  The <code>isDirty</code> function deconstructs the hidden field value and compares
+  The <code>getDirty</code> returns an array of <code>DirtyPanelExtender.DirtyObject</code> instances, which describe all 
+  the changes. The <code>isDirty</code> function returns true or false depending on whether there were any changes. 
+ </p>
+ <p>
+  The <code>getDirty</code> function deconstructs the hidden field value and compares
   the current form values one-by-one, for each type of input control.
  </p>
- <pre lang="jscript">isDirty : function() {
+ <pre lang="jscript">getDirty : function() {
+ var result = new Array()
  var values_control = document.getElementById(this.get_element().id + "_Values");
  var values = values_control["value"].split(",");
  for (i in values) {
@@ -262,21 +267,21 @@ protected override void OnPreRender(EventArgs e)
   if (control.type == 'checkbox' || control.type == 'radio') {
    var boolvalue = (value == "true" ? true : false);
    if(control.checked != boolvalue) {
-    return true;
+    result[result.length] = new DirtyPanelExtender.DirtyObject("checkbox", control, control.checked, boolvalue);
    }
   } else if (control.type == 'select-one') {
    if ( control.size > 0 ){
     // control is listbox
     ...
     if( encodeURIComponent(optionValues) != value ){
-     return true;
+     result[result.length] = new DirtyPanelExtender.DirtyObject("listbox", control, encodeURIComponent(optionValues), value);
     }
    } else if(control.selectedIndex != value) {
-     return true;
+     result[result.length] = new DirtyPanelExtender.DirtyObject("dropdown", control, control.selectedIndex, value);
    }
   } else {
    if(encodeURIComponent(control.value) != value) {
-       return true;
+       result[result.length] = new DirtyPanelExtender.DirtyObject(control.type, control, control.value, value);
    }
   }
  }
@@ -287,7 +292,7 @@ protected override void OnPreRender(EventArgs e)
   Dealing with Lists
  </h2>
  <p>
-  The actual implementation of <code>isDirty</code> is a little more complex, especially
+  The actual implementation of <code>getDirty</code> is a little more complex, especially
   for lists. These typically inherit from <code>ListControl</code>. It is necessary
   to support both selection and data changes in the list, and <code>GetValuesArray</code>
   creates two hidden variables, <code>id:selection:value</code> and <code>id:data:value</code>
@@ -308,7 +313,31 @@ else if (control is ListControl)
 }
  </pre>
  <p>
-  <code>isDirty</code> will process both types of values.
+  The <code>RadioButtonList</code> control is treated differently and must save the selection state. The <code>CheckBoxList</code> 
+  control is even trickier, with child checkboxes being actual controls when selected by default.
+ </p>
+ <pre>
+if (control is RadioButtonList)
+{
+    for (int i = 0; i < ((RadioButtonList)control).Items.Count; i++)
+    {
+        values.Add(string.Format("{0}_{1}:{2}", control.ClientID, i, ((RadioButtonList)control).Items[i].Selected.ToString().ToLower()));
+    }
+}
+else if (control is CheckBox && control.Parent is CheckBoxList)
+{
+    // checked checkboxes within a list appear as real controls
+}
+else if (control is CheckBoxList)
+{
+    for (int i = 0; i < ((CheckBoxList)control).Items.Count; i++)
+    {
+        values.Add(string.Format("{0}_{1}:{2}", control.ClientID, i, ((CheckBoxList)control).Items[i].Selected.ToString().ToLower()));
+    }
+}
+ </pre>
+ <p>
+  <code>getDirty</code> will process both types of values.
  </p>
  <pre lang="jscript">
 } else if (control.type == 'select-one' || control.type == 'select-multiple') {
@@ -331,11 +360,11 @@ else if (control is ListControl)
          }
          if( encodeURIComponent(optionValues) != value ) {
             // items in the listbox have changed
-            return true;
+            result[result.length] = new DirtyPanelExtender.DirtyObject("listbox", control, encodeURIComponent(optionValues), value);
          }
      }
  } else if(control.selectedIndex != value) {
-     return true;
+     // ...
  }
   </pre>
  <h2>
@@ -352,8 +381,8 @@ else if (control is ListControl)
   <ul>
    <li>bug: doesn't work with Opera; tested with Opera 9.21</li>
    <li>bug: doesn't work with Safari; tested with 3.0.2 WinXP</li>
-   <li>bug: partial support for RadioButtonList - selection changes only, no dynamic
-    data changes</li>
+   <li>bug: partial support for RadioButtonList - selection changes only, no dynamic data changes</li>
+   <li>bug: partial support for CheckBoxList - selection changes only, no dynamic data changes</li>
   </ul>
  </p>
  <h2>
@@ -367,6 +396,9 @@ else if (control is ListControl)
   <li>08/13/2007: added demo and documentation for using the extender with master pages</li>
   <li>08/28/2007: added RadioButtonList and ListBox support and demo for both data
    and selection (thanks to David Christensen)</li>
+  <li>10/01/2007: added CheckBoxList partial support</li>
+  <li>10/01/2007: added getDirty that returns a structured list of changes</li>
+  <li>10/01/2007: added toString and demo that shows controls with changes</li>
  </ul>
 </body>
 </html>

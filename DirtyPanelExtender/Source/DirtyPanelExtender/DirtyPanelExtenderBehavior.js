@@ -1,14 +1,27 @@
 Type.registerNamespace('DirtyPanelExtender');
 
 DirtyPanelExtender.DirtyPanelExtenderBehavior = function(element) {
-
     DirtyPanelExtender.DirtyPanelExtenderBehavior.initializeBase(this, [element]);
     this._OnLeaveMessageValue = null;
+}
+
+DirtyPanelExtender.DirtyObject = function(type, control, newvalue, oldvalue) {
+    this.type = type;
+    this.control = control;
+    this.oldvalue = oldvalue;
+    this.newvalue = newvalue;
 }
 
 DirtyPanelExtender.DirtyPanelExtenderBehavior.prototype = {
 
     isDirty : function() {
+        var dirty;
+        dirty = this.getDirty();
+        return dirty.length > 0;
+    },
+
+    getDirty : function() {
+        var result = new Array()
         var values_control = document.getElementById(this.get_element().id + "_Values");
         var values = values_control["value"].split(",");
         for (i in values) {
@@ -22,8 +35,7 @@ DirtyPanelExtender.DirtyPanelExtenderBehavior.prototype = {
             if (control.type == 'checkbox' || control.type == 'radio') {
                 var boolvalue = (value == "true" ? true : false);
                 if(control.checked != boolvalue) {
-                    // alert("checkbox changed: " + control.checked + " vs. " + boolvalue);
-                    return true;
+                    result[result.length] = new DirtyPanelExtender.DirtyObject("checkbox", control, control.checked, boolvalue);
                 }
             } else if (control.type == 'select-one' || control.type == 'select-multiple') {
                if (namevaluepair.length > 2) {
@@ -44,22 +56,19 @@ DirtyPanelExtender.DirtyPanelExtenderBehavior.prototype = {
                        }
                        if( encodeURIComponent(optionValues) != value ) {
                           // items in the listbox have changed
-                          // alert("listbox " + code + " changed: " + encodeURIComponent(optionValues) + " vs. " + value);
-                          return true;
+                          result[result.length] = new DirtyPanelExtender.DirtyObject("listbox", control, encodeURIComponent(optionValues), value);
                        }
                    }
                } else if(control.selectedIndex != value) {
-                   // alert("dropdown selection changed: " + control.selectedIndex + " vs. " + value);
-                   return true;
+                   result[result.length] = new DirtyPanelExtender.DirtyObject("dropdown", control, control.selectedIndex, value);
                }
             } else {
                 if(encodeURIComponent(control.value) != value) {
-                    // alert("control " + control.type + " changed: " + control.value + " vs. " + value);
-                    return true;
+                    result[result.length] = new DirtyPanelExtender.DirtyObject(control.type, control, control.value, value);
                 }
             }
-        }
-        return false;
+        }        
+        return result;
     },
     
     initialize : function() {        
@@ -77,6 +86,20 @@ DirtyPanelExtender.DirtyPanelExtenderBehavior.prototype = {
 
     set_OnLeaveMessage : function(value) {
         this._OnLeaveMessageValue = value;
+    },
+    
+    toString : function() {
+        var result = this.get_element().id + ":";
+        var dirty = this.getDirty();
+        if (dirty.length == 0) {
+            result = result + "clean";
+        } else {
+            for (i in dirty) {
+               result = result + "\n" + dirty[i].control.id + " (" + dirty[i].type + ") - [" 
+                + dirty[i].oldvalue + "][" + dirty[i].newvalue + "]"; 
+            }
+        }
+        return result;
     }
 }
 

@@ -56,11 +56,22 @@ namespace DirtyPanelExtender
                         values.Add(string.Format("{0}_{1}:{2}", control.ClientID, i, ((RadioButtonList)control).Items[i].Selected.ToString().ToLower()));
                     }
                 }
+                else if (control is CheckBox && control.Parent is CheckBoxList)
+                {
+                    // checked checkboxes within a list appear as real controls
+                }
+                else if (control is CheckBoxList)
+                {
+                    for (int i = 0; i < ((CheckBoxList)control).Items.Count; i++)
+                    {
+                        values.Add(string.Format("{0}_{1}:{2}", control.ClientID, i, ((CheckBoxList)control).Items[i].Selected.ToString().ToLower()));
+                    }
+                }
                 else if (control is ListControl)
                 {
                     StringBuilder data = new StringBuilder();
                     StringBuilder selection = new StringBuilder();
-                    foreach (ListItem item in ((ListControl) control).Items)
+                    foreach (ListItem item in ((ListControl)control).Items)
                     {
                         data.AppendLine(item.Text);
                         selection.AppendLine(item.Selected.ToString().ToLower());

@@ -15,6 +15,31 @@
   <p>
    Write something, then <a href="Default.aspx">click here</a> to go back.
   </p>
+  <p>
+   <script type="text/javascript" language="javascript">
+    function replaceAll(what, source, target) {
+        var temp = what;
+        var i = temp.indexOf(source);
+        while(i > -1) {
+            temp = temp.replace(source, target);
+            i = temp.indexOf(source, i + target.length + 1);
+        }
+        return temp;
+    }    
+    function showDirty() {
+        var result = "";
+        for (i in DirtyPanelExtender_dirtypanels) {
+            var panel = DirtyPanelExtender_dirtypanels[i];
+            var panelresult = replaceAll(panel.toString(), "\n", "<li>");
+            panelresult = replaceAll(panelresult, ":", ":</b><ul>");
+            result = result + "<p><b>" + panelresult + "</ul></p>";
+        }
+        document.getElementById("dirtyState").innerHTML = result;
+    }
+   </script>
+   <a href="#" onclick="showDirty();">&#187; check dirty state</a>
+  </p>
+  <div id="dirtyState"></div>
   <dp:DirtyPanelExtender ID="demoPanelExtender" runat="server" TargetControlID="demoPanel"
    OnLeaveMessage="There's still unsaved data on the page!" />
   <asp:UpdatePanel ID="demoPanel" runat="server">
@@ -36,8 +61,15 @@
       <asp:ListItem Text="second" />
       <asp:ListItem Text="third" />
      </asp:RadioButtonList>
-     <asp:Button ID="demoRadioAdd" runat="server" OnClick="demoRadioAdd_Click" Text="Add" />
-     (doesn't work)
+     <asp:Button Enabled="false" ID="demoRadioAdd" runat="server" OnClick="demoRadioAdd_Click" Text="Add" />
+    </p>
+    <p>
+     <asp:CheckBoxList ID="demoCheckBoxList" runat="server">
+      <asp:ListItem Selected="true" Text="first" />
+      <asp:ListItem Text="second" />
+      <asp:ListItem Text="third" />
+     </asp:CheckBoxList>
+     <asp:Button Enabled="false" ID="demoCheckBoxListAdd" runat="server" OnClick="demoCheckBoxListAdd_Click" Text="Add" />
     </p>
     <p>
      <asp:ListBox ID="demoListBox" runat="server">
