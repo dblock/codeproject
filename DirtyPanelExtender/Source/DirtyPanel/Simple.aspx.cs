@@ -15,7 +15,10 @@ namespace DirtyPanel
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            if (!IsPostBack)
+            {
+                demoDropDown.Items.Add(new ListItem("Added in Page_Load"));
+            }
         }
 
         public void save_Click(object sender, EventArgs e)
