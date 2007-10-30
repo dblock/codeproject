@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252"><LINK 
+href="global.css" type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.6000.16546" name=GENERATOR></HEAD>
+<BODY>
+<UL class=download>
+  <LI><A 
+  href="http://www.codeproject.com/aspnet/dynamicsitemap/dynamicsitemap_src.zip">Download 
+  source - 9.91 Kb</A> </LI></UL>
+<P><IMG height=199 alt="dynamic sitemap rendered" 
+src="dynamicsitemap.jpg" width=547 border=1></P>
+<UL>
+  <LI><A href="http://www.foodcandy.com/" target=_blank>Live Demo</A></LI></UL>
+<H2>Introduction</H2>
+<P>Sitemaps and breadcrumbs (SiteMapPath) are useful and easy to implement for a 
+static site with a sitemap file. For dynamic sites, something as simple seems to 
+get much more complicated. 
+<P>When I started reading about sitemaps for dynamic sites, I found a common 
+approach: generate a static site map for the whole website from, for example, a 
+data source. Re-generate periodically. Use the <A 
+href="http://msdn2.microsoft.com/en-us/library/system.web.xmlsitemapprovider.aspx" 
+target=_blank>XmlSiteMapProvider</A>. Cache. The technique is described in <A 
+href="http://www.codeproject.com/useritems/DynamicSitemapASPNET2.asp">this 
+CodeProject article</A>. </P>
+<P>This doesn't work for my site at all. I need to provide a site map for a 
+large number of pages, potentially hundreds of thousands. The site is deep and 
+dynamic, and only a small unpredictable set of pages is accessed frequently. 
+There're also two hundred different object types in the back-end database which 
+is not coupled with the user-interface at all. Querying everything once is not 
+trivial. Generating an accurate site map for the whole site would take too long, 
+would be a lot of code, and would definitely take too much memory to cache.</P>
+<P>This article demonstrates a simpler and practical solution chosen. You can 
+see it working live on <A href="http://www.foodcandy.com/" 
+target=_blank>http://www.foodcandy.com/</A>.</P>
+<H2>Architecture</H2>
+<P>The core of the architecture is a relatively simple dynamic data provider, 
+<STRONG><CODE>SiteMapDataProvider</CODE></STRONG>, based on the <A 
+href="http://msdn2.microsoft.com/en-us/library/system.web.staticsitemapprovider(VS.80).aspx" 
+target=_blank><CODE>StaticSiteMapProvider</CODE></A>. The provider is used as 
+the default provider throughout the application, and can stack nodes that appear 
+in the site map path. Each document that renders dynamic content stacks itself 
+with the appropriate hierarchy of parent nodes.</P>
+<H2>Implementation</H2>
+<P>The <CODE>SiteMapDataProvider</CODE> is straightforward. It will create a 
+root node, and can stack a node behind any existing node, creating a path.</P><PRE lang=cs>public class SiteMapDataProvider : StaticSiteMapProvider
+{
+ private SiteMapNode mRootNode = null;
+
+ ...
+
+ // create the root node
+ public override void Initialize(string name, 
+        NameValueCollection attributes)
+ {
+     base.Initialize(name, attributes);
+     mRootNode = new SiteMapNode(this, "Home", 
+                 "Default.aspx", "Home");
+     AddNode(mRootNode);
+ }
+
+ public override SiteMapNode FindSiteMapNode(string rawUrl)
+ {
+     return base.FindSiteMapNode(rawUrl);
+ }
+
+ // stack a node under the root
+ public SiteMapNode Stack(string title, string uri)
+ {
+     return Stack(title, uri, mRootNode);
+ }
+
+ // stack a node under any other node
+ public SiteMapNode Stack(string title, string uri, 
+                    SiteMapNode parentnode)
+ {
+     lock (this)
+     {
+         SiteMapNode node = base.FindSiteMapNodeFromKey(uri);
+
+         if (node == null)
+         {
+             node = new SiteMapNode(this, uri, uri, title);
+             node.ParentNode = 
+               ((parentnode == null) ? mRootNode : parentnode);
+             AddNode(node);
+         }
+         else if (node.Title != title)
+         {<BR>             // support renaming documents
+             node.Title = title;
+         }
+  
+         return node;
+     }
+ }
+}</PRE>
+<P>I have put the above implementation in a <I>DBlock.SiteMapProvider.dll</I> 
+assembly, and have referenced it in <I>web.config</I> as the default provider. 
+</P><PRE lang=xml>&lt;?xml version="1.0"?&gt;
+&lt;configuration&gt;
+ &lt;system.web&gt;
+<STRONG>  &lt;siteMap enabled="true" 
+            defaultProvider="SiteMapDataProvider"&gt; 
+   &lt;providers&gt;
+    &lt;add name="SiteMapDataProvider" 
+       type="DBlock.SiteMapDataProvider, DBlock.SiteMapDataProvider" /&gt;
+   &lt;/providers&gt;
+  &lt;/siteMap&gt;</STRONG>
+ &lt;/system.web&gt;
+&lt;/configuration&gt;</PRE>
+<P>I've added a simple master page with a SiteMapPath and a default page. This 
+yields a <STRONG>Home</STRONG> (root) site map node on <I>Default.aspx</I>. </P>
+<P>Now remember, the goal is to have a dynamic site map. I've added a button 
+that redirects to <STRONG><I>Default.aspx?id=&lt;guid&gt;</I> </STRONG>for demo 
+purposes. To display the site map accordingly, I've built a linked list of site 
+map nodes, then stacked them into the site map.&nbsp; Below is the 
+<I>Default.aspx</I> <CODE>Page_Load</CODE> and one more helper function in 
+<CODE>SiteMapDataProvider</CODE> to do the stack.</P>
+<P><PRE lang=cs>string id = Request["id"];
+if (!string.IsNullOrEmpty(id))
+{
+  List&lt;KeyValuePair&lt;string, Uri&gt;&gt; nodes = 
+     new List&lt;KeyValuePair&lt;string, Uri&gt;&gt;();
+  nodes.Add(new KeyValuePair&lt;string, 
+     Uri&gt;("Dynamic Content", new Uri(Request.Url, "Default.aspx?id=")));
+  nodes.Add(new KeyValuePair&lt;string, Uri&gt;(Request["id"], Request.Url));
+  ((SiteMapDataProvider) SiteMap.Provider).Stack(nodes);
+}</PRE><PRE lang=cs>public void Stack(List&lt;KeyValuePair&lt;string, Uri&gt;&gt; nodes)
+{ 
+  SiteMapNode parent = RootNode; 
+  foreach (KeyValuePair&lt;string, Uri&gt; node in nodes)
+  {
+   parent = Stack(node.Key, node.Value.PathAndQuery, parent); 
+  } 
+} </PRE>
+<H2>Points of Interest</H2>
+<P>This works very well for pages that retrieve dynamic content. My project 
+typically retrieves objects from the database or cache, and displays them on 
+each page. Adding two-three lines of code to each page generates the complete 
+site map of pages that are actually being hit.</P>
+<P>The obvious disadvantage of this technique is that you have to add code in 
+each page to generate the site map, and that you must carefully track the URL of 
+your intermediate nodes (the <I>Default.aspx?id=</I>, with a blank ID, in the 
+example above) to keep things consistent. It would be great to describe the 
+relationship between dynamic pages in some other form that can be verified at 
+compile time. Maybe, a better (yet more complex) approach is to extend the XML 
+provider to allow dynamic binding in nodes?</P>
+<P>You may also want to limit the size of the site map for large sites to avoid 
+consuming too much memory. Simply clear the site map once it has reached your 
+size limit.</P>
+<H2>History</H2>
+<UL>
+  <LI><STRONG>2006/12/16</STRONG>: Initial release.</LI></UL><!----------------------------- Article Ends -----------------------------></BODY></HTML>
