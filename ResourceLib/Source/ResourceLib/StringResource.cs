@@ -8,11 +8,11 @@ namespace Vestris.ResourceLib
 {
     public class StringResource
     {
-        Kernel32.STRING_OR_VAR_INFO_HEADER _header;
+        Kernel32.RESOURCE_HEADER _header;
         string _key;
         string _value;
 
-        public Kernel32.STRING_OR_VAR_INFO_HEADER Header
+        public Kernel32.RESOURCE_HEADER Header
         {
             get
             {
@@ -54,8 +54,8 @@ namespace Vestris.ResourceLib
 
         public void Load(IntPtr lpRes)
         {
-            _header = (Kernel32.STRING_OR_VAR_INFO_HEADER)Marshal.PtrToStructure(
-                lpRes, typeof(Kernel32.STRING_OR_VAR_INFO_HEADER));
+            _header = (Kernel32.RESOURCE_HEADER)Marshal.PtrToStructure(
+                lpRes, typeof(Kernel32.RESOURCE_HEADER));
 
             IntPtr pKey = new IntPtr(lpRes.ToInt32() + Marshal.SizeOf(_header));
             _key = Marshal.PtrToStringUni(pKey);
