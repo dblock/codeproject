@@ -96,7 +96,7 @@ namespace DirtyPanelExtender
         public void ResetDirtyFlag()
         {
             ScriptManager.RegisterClientScriptBlock(TargetControl, TargetControl.GetType(),
-                string.Format("{0}_Values_Update", TargetControl.ClientID), string.Format("document.getElementById('{0}').value = '{1}';",
+                string.Format("{0}_Values_Update", TargetControl.ClientID), string.Format("document.getElementById(\"{0}\").value = \"{1}\";",
                     string.Format("{0}_Values", TargetControl.ClientID), String.Join(",", GetValuesArray())), true);
         }
     }
