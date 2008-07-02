@@ -63,7 +63,12 @@ DirtyPanelExtender.DirtyPanelExtenderBehavior.prototype = {
                    result[result.length] = new DirtyPanelExtender.DirtyObject("dropdown", control, control.selectedIndex, value);
                }
             } else {
-                if(encodeURIComponent(control.value) != value) {
+                var controlValue = encodeURIComponent(control.value);
+                // Replace any CRLF with LF only to avoid multi-line values being mistakenly flagged as changed.
+                var regex = /%0D%0A/  // CRLF
+                controlValue = controlValue.replace(regex, "%0A");
+                value = value.replace(regex, "%0A");                
+                if(controlValue != value) {
                     result[result.length] = new DirtyPanelExtender.DirtyObject(control.type, control, control.value, value);
                 }
             }
