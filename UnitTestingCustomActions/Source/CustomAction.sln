@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CustomAction", "CustomAction\CustomAction.vcproj", "{F90D16A2-E2FC-43F1-B023-A766ADC49ED4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CustomActionTest", "CustomActionTest\CustomActionTest.vcproj", "{32BABDBE-B369-437D-BEF1-DEFCA7294E91}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F90D16A2-E2FC-43F1-B023-A766ADC49ED4} = {F90D16A2-E2FC-43F1-B023-A766ADC49ED4}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F90D16A2-E2FC-43F1-B023-A766ADC49ED4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F90D16A2-E2FC-43F1-B023-A766ADC49ED4}.Debug|Win32.Build.0 = Debug|Win32
+		{F90D16A2-E2FC-43F1-B023-A766ADC49ED4}.Release|Win32.ActiveCfg = Release|Win32
+		{F90D16A2-E2FC-43F1-B023-A766ADC49ED4}.Release|Win32.Build.0 = Release|Win32
+		{32BABDBE-B369-437D-BEF1-DEFCA7294E91}.Debug|Win32.ActiveCfg = Debug|Win32
+		{32BABDBE-B369-437D-BEF1-DEFCA7294E91}.Debug|Win32.Build.0 = Debug|Win32
+		{32BABDBE-B369-437D-BEF1-DEFCA7294E91}.Release|Win32.ActiveCfg = Release|Win32
+		{32BABDBE-B369-437D-BEF1-DEFCA7294E91}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
