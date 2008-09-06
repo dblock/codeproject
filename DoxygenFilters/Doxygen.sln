@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WixDoxyFilter", "WixDoxyFilter\WixDoxyFilter.csproj", "{1F9AEAC9-DB7E-4E41-A510-CD09745B456A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WixExtXsdDoxyFilter", "WixExtXsdDoxyFilter\WixExtXsdDoxyFilter.csproj", "{CCC5E89B-AED4-4F5D-8D66-B13E87E3F7F5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F9AEAC9-DB7E-4E41-A510-CD09745B456A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F9AEAC9-DB7E-4E41-A510-CD09745B456A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F9AEAC9-DB7E-4E41-A510-CD09745B456A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F9AEAC9-DB7E-4E41-A510-CD09745B456A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCC5E89B-AED4-4F5D-8D66-B13E87E3F7F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCC5E89B-AED4-4F5D-8D66-B13E87E3F7F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCC5E89B-AED4-4F5D-8D66-B13E87E3F7F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCC5E89B-AED4-4F5D-8D66-B13E87E3F7F5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
