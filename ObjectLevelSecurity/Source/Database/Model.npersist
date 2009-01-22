@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<domain name="Data.NHibernate" assembly="Data.NHibernate" source="OLS Domain Model" field-prefix="_" count="Lazy" load="Lazy" implements=": IDataObject">
+  <class name="Account" table="Account">
+    <property name="Id" id="true" columns="Account_Id" type="System.Int32" />
+    <property name="BlogAuthors" table="BlogAuthor" id-columns="Account_Id" list="true" item-type="BlogAuthor" slave="true" ref="ManyToOne" inverse="Account" inherits-inverse="true" />
+    <property name="BlogPosts" table="BlogPost" id-columns="Account_Id" list="true" item-type="BlogPost" slave="true" ref="ManyToOne" inverse="Account" inherits-inverse="true" />
+    <property name="Blogs" table="Blog" id-columns="Account_Id" list="true" item-type="Blog" slave="true" ref="ManyToOne" inverse="Account" inherits-inverse="true" />
+    <property name="Created" columns="Created" type="System.DateTime" />
+    <property name="Name" columns="Name" type="System.String" />
+    <property name="Password" columns="Password" type="System.String" />
+  </class>
+  <class name="Blog" table="Blog">
+    <property name="Id" id="true" columns="Blog_Id" type="System.Int32" />
+    <property name="Account" columns="Account_Id" ref="OneToMany" inverse="Blogs" type="Account" />
+    <property name="BlogAuthors" table="BlogAuthor" id-columns="Blog_Id" list="true" item-type="BlogAuthor" slave="true" ref="ManyToOne" inverse="Blog" inherits-inverse="true" />
+    <property name="BlogPosts" table="BlogPost" id-columns="Blog_Id" list="true" item-type="BlogPost" slave="true" ref="ManyToOne" inverse="Blog" inherits-inverse="true" />
+    <property name="Created" columns="Created" type="System.DateTime" />
+    <property name="Description" columns="Description" type="System.String" />
+    <property name="Name" columns="Name" type="System.String" />
+  </class>
+  <class name="BlogAuthor" table="BlogAuthor">
+    <property name="Id" id="true" columns="BlogAuthor_Id" type="System.Int32" />
+    <property name="Account" columns="Account_Id" ref="OneToMany" inverse="BlogAuthors" type="Account" />
+    <property name="Blog" columns="Blog_Id" ref="OneToMany" inverse="BlogAuthors" type="Blog" />
+  </class>
+  <class name="BlogPost" table="BlogPost">
+    <property name="Id" id="true" columns="BlogPost_Id" type="System.Int32" />
+    <property name="Account" columns="Account_Id" ref="OneToMany" inverse="BlogPosts" type="Account" />
+    <property name="Blog" columns="Blog_Id" ref="OneToMany" inverse="BlogPosts" type="Blog" />
+    <property name="Body" columns="Body" type="System.String" />
+    <property name="Created" columns="Created" type="System.DateTime" />
+    <property name="Title" columns="Title" type="System.String" />
+  </class>
+  <source name="OLS Domain Model" type="MSSqlServer" provider="SqlClient" schema="dbo">
+    <connection-string>Database=OLS;Trusted_Connection=yes;</connection-string>
+    <table name="Account">
+      <column name="Account_Id" primary="true" type="Int32" prec="10" length="4" scale="0" auto-inc="true" seed="1" inc="1" />
+      <column name="Created" type="DateTime" prec="23" length="8" scale="3" />
+      <column name="Name" type="String" prec="128" length="256" scale="0" />
+      <column name="Password" type="AnsiString" prec="16" length="16" scale="0" />
+    </table>
+    <table name="Blog">
+      <column name="Blog_Id" primary="true" type="Int32" prec="10" length="4" scale="0" auto-inc="true" seed="1" inc="1" />
+      <column name="Account_Id" type="Int32" prec="10" length="4" scale="0" foreign="true" primary-table="Account" primary-column="Account_Id" foreign-key="FK_Blog_Account" />
+      <column name="Created" type="DateTime" prec="23" length="8" scale="3" />
+      <column name="Description" type="String" prec="256" allow-null="true" length="512" scale="0" />
+      <column name="Name" type="String" prec="64" length="128" scale="0" />
+    </table>
+    <table name="BlogAuthor">
+      <column name="BlogAuthor_Id" primary="true" type="Int32" prec="10" length="4" scale="0" auto-inc="true" seed="1" inc="1" />
+      <column name="Account_Id" type="Int32" prec="10" length="4" scale="0" foreign="true" primary-table="Account" primary-column="Account_Id" foreign-key="FK_BlogAuthor_Account" />
+      <column name="Blog_Id" type="Int32" prec="10" length="4" scale="0" foreign="true" primary-table="Blog" primary-column="Blog_Id" foreign-key="FK_BlogAuthor_Blog" />
+    </table>
+    <table name="BlogPost">
+      <column name="BlogPost_Id" primary="true" type="Int32" prec="10" length="4" scale="0" auto-inc="true" seed="1" inc="1" />
+      <column name="Account_Id" type="Int32" prec="10" length="4" scale="0" foreign="true" primary-table="Account" primary-column="Account_Id" foreign-key="FK_BlogPost_Account" />
+      <column name="Blog_Id" type="Int32" prec="10" length="4" scale="0" foreign="true" primary-table="Blog" primary-column="Blog_Id" foreign-key="FK_BlogPost_Blog" />
+      <column name="Body" type="String" prec="256" allow-null="true" length="512" scale="0" />
+      <column name="Created" type="DateTime" prec="23" length="8" scale="3" />
+      <column name="Title" type="String" prec="128" length="256" scale="0" />
+    </table>
+  </source>
+</domain>
