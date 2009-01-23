@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<domain name="Data.NHibernate" assembly="Data.NHibernate" source="OLS Domain Model" field-prefix="_" count="Lazy" load="Lazy" implements=": IDataObject">
+<domain name="Data.NHibernate" assembly="Data.NHibernate" root="Vestris.Data.NHibernate" source="OLS Domain Model" field-prefix="_" count="Lazy" load="Lazy" implements=": IDataObject">
   <class name="Account" table="Account">
     <property name="Id" id="true" columns="Account_Id" type="System.Int32" />
     <property name="BlogAuthors" table="BlogAuthor" id-columns="Account_Id" list="true" item-type="BlogAuthor" slave="true" ref="ManyToOne" inverse="Account" inherits-inverse="true" />

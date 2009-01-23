@@ -1,4 +1,7 @@
 ﻿using System;
+namespace Vestris.Data.NHibernate
+{
+
     ///--------------------------------------------------------------------------------
     ///<summary>
     ///Persistent domain entity class representing 'Blog' entities.
@@ -39,7 +42,7 @@
         ///The property maps to the column 'Blog_Id' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  System.Int32 Id
+        public virtual System.Int32 Id
         {
             get
             {
@@ -62,7 +65,7 @@
         ///The property maps to the column 'Account_Id' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  Account Account
+        public virtual Account Account
         {
             get
             {
@@ -93,7 +96,7 @@
         ///The property maps to the identity column 'Blog_Id' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  System.Collections.Generic.IList<BlogAuthor> BlogAuthors
+        public virtual System.Collections.Generic.IList<BlogAuthor> BlogAuthors
         {
             get
             {
@@ -124,7 +127,7 @@
         ///The property maps to the identity column 'Blog_Id' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  System.Collections.Generic.IList<BlogPost> BlogPosts
+        public virtual System.Collections.Generic.IList<BlogPost> BlogPosts
         {
             get
             {
@@ -149,7 +152,7 @@
         ///The property maps to the column 'Created' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  System.DateTime Created
+        public virtual System.DateTime Created
         {
             get
             {
@@ -174,7 +177,7 @@
         ///The property maps to the column 'Description' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  System.String Description
+        public virtual System.String Description
         {
             get
             {
@@ -199,7 +202,7 @@
         ///The property maps to the column 'Name' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  System.String Name
+        public virtual System.String Name
         {
             get
             {
@@ -225,3 +228,4 @@
 #endregion //Unsynchronized Custom Code Region
 
     }
+}

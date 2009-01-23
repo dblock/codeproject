@@ -1,4 +1,7 @@
 ﻿using System;
+namespace Vestris.Data.NHibernate
+{
+
     ///--------------------------------------------------------------------------------
     ///<summary>
     ///Persistent domain entity class representing 'BlogAuthor' entities.
@@ -35,7 +38,7 @@
         ///The property maps to the column 'BlogAuthor_Id' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  System.Int32 Id
+        public virtual System.Int32 Id
         {
             get
             {
@@ -58,7 +61,7 @@
         ///The property maps to the column 'Account_Id' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  Account Account
+        public virtual Account Account
         {
             get
             {
@@ -85,7 +88,7 @@
         ///The property maps to the column 'Blog_Id' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  Blog Blog
+        public virtual Blog Blog
         {
             get
             {
@@ -111,3 +114,4 @@
 #endregion //Unsynchronized Custom Code Region
 
     }
+}

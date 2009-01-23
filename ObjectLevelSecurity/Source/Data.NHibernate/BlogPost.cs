@@ -1,4 +1,7 @@
 ﻿using System;
+namespace Vestris.Data.NHibernate
+{
+
     ///--------------------------------------------------------------------------------
     ///<summary>
     ///Persistent domain entity class representing 'BlogPost' entities.
@@ -38,7 +41,7 @@
         ///The property maps to the column 'BlogPost_Id' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  System.Int32 Id
+        public virtual System.Int32 Id
         {
             get
             {
@@ -61,7 +64,7 @@
         ///The property maps to the column 'Account_Id' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  Account Account
+        public virtual Account Account
         {
             get
             {
@@ -88,7 +91,7 @@
         ///The property maps to the column 'Blog_Id' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  Blog Blog
+        public virtual Blog Blog
         {
             get
             {
@@ -113,7 +116,7 @@
         ///The property maps to the column 'Body' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  System.String Body
+        public virtual System.String Body
         {
             get
             {
@@ -138,7 +141,7 @@
         ///The property maps to the column 'Created' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  System.DateTime Created
+        public virtual System.DateTime Created
         {
             get
             {
@@ -163,7 +166,7 @@
         ///The property maps to the column 'Title' in the data source.
         ///</remarks>
         ///--------------------------------------------------------------------------------
-        public  System.String Title
+        public virtual System.String Title
         {
             get
             {
@@ -189,3 +192,4 @@
 #endregion //Unsynchronized Custom Code Region
 
     }
+}

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-interface IDataObject
+public interface IDataObject
 {
     System.Int32 Id { get; }
 }
