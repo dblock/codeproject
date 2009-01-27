@@ -11,6 +11,9 @@ namespace Vestris.Service.Data
         {
             // allow everyone to create an account
             this.Add(new ACLEveryoneAllowCreate());
+            // everyone can see accounts
+            this.Add(new ACLEveryoneAllowRetrieve());
+            // owner can do everything with his own account
             this.Add(new ACLAccount(instance, DataOperation.All));
         }
     }

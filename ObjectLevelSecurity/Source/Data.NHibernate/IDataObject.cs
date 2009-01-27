@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-public interface IDataObject
+namespace Vestris.Data.NHibernate
 {
-    System.Int32 Id { get; }
+    public interface IDataObject
+    {
+        System.Int32 Id { get; }
+    }
 }

@@ -45,23 +45,19 @@ namespace Vestris.Data.NHibernate.UnitTests
         {
             get
             {
-                if (_factory == null)
-                {
-                    _factory = CreateSessionFactory();
-                }
-
                 return _factory.Instance;
             }
         }
 
         [SetUp]
-        public void SetUp()
+        public virtual void SetUp()
         {
+            _factory = CreateSessionFactory(); 
             _session = Factory.OpenSession();
         }
 
         [TearDown]
-        public void TearDown()
+        public virtual void TearDown()
         {
             _session.Close();
             _session = null;

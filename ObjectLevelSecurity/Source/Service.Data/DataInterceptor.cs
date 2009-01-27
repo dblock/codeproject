@@ -35,13 +35,25 @@ namespace Vestris.Service.Data
             return base.Instantiate(clazz, id);
         }
 
+        public override bool OnFlushDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, NHibernate.Type.IType[] types)
+        {
+            Console.WriteLine("FlushDirty: {0}:{1} (ctx: {2})", entity, id, _ctx.AccountId);
+
+            if (entity is IDataObject)
+            {
+                Check((IDataObject)entity, DataOperation.Update);
+            }
+
+            return base.OnFlushDirty(entity, id, currentState, previousState, propertyNames, types);
+        }
+
         public override bool OnSave(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
         {
-            Console.WriteLine("Save: {0}:{1}", entity, id);
+            Console.WriteLine("Save: {0}:{1} (ctx: {2})", entity, id, _ctx.AccountId);
             
             if (entity is IDataObject)
             {
-                Check((IDataObject)entity, id == null ? DataOperation.Create : DataOperation.Update);
+                Check((IDataObject)entity, DataOperation.Create);
             }
 
             return base.OnSave(entity, id, state, propertyNames, types);
@@ -49,7 +61,7 @@ namespace Vestris.Service.Data
 
         public override bool OnLoad(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
         {
-            Console.WriteLine("Load: {0}:{1}", entity, id);
+            Console.WriteLine("Load: {0}:{1} (ctx: {2})", entity, id, _ctx.AccountId);
 
             if (entity is IDataObject)
             {
@@ -61,7 +73,7 @@ namespace Vestris.Service.Data
 
         public override void OnDelete(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
         {
-            Console.WriteLine("Delete: {0}:{1}", entity, id);
+            Console.WriteLine("Delete: {0}:{1} (ctx: {2})", entity, id, _ctx.AccountId);
 
             if (entity is IDataObject)
             {

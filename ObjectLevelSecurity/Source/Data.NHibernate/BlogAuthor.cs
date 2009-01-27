@@ -69,6 +69,11 @@ namespace Vestris.Data.NHibernate
             }
             set
             {
+                if (_Account != null)
+                {
+                    throw new InvalidOperationException();
+                }
+
                 _Account = value;
             }
         }

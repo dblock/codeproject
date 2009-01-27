@@ -9,7 +9,7 @@ namespace Vestris.Service.Identity
         public AccessDeniedException()
             : base("Access Denied")
         {
-
+            Console.WriteLine("Throw: Access Denied");
         }
     }
 }
