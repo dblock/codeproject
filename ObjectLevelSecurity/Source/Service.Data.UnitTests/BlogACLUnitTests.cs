@@ -47,11 +47,13 @@ namespace Vestris.Service.Data.UnitTests
             }
             finally
             {
+                Session = null;
+                // delete temp user
+                DeleteUser(user2);
                 // delete blog
                 CurrentUserContext = saved;
                 Session.Delete(blog);
-                // delete temp user
-                DeleteUser(user2);
+                Session.Flush();
             }
         }
     }

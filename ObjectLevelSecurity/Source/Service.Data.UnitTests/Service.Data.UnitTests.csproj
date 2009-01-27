@@ -46,6 +46,7 @@
     <Compile Include="AccountACLUnitTests.cs" />
     <Compile Include="ACLClassUnitTests.cs" />
     <Compile Include="BlogACLUnitTests.cs" />
+    <Compile Include="BlogPostACLUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserContextUnitTests.cs" />
   </ItemGroup>

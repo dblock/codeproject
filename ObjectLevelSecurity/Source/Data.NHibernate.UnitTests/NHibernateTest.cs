@@ -45,6 +45,10 @@ namespace Vestris.Data.NHibernate.UnitTests
         {
             get
             {
+                if (_factory == null)
+                {
+                    _factory = CreateSessionFactory();
+                }
                 return _factory.Instance;
             }
         }
