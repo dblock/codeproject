@@ -11,8 +11,8 @@ namespace Vestris.Data.NHibernate.UnitTests
     /// </summary>
     public class NHibernateTest
     {
-        private static SessionFactory _factory = new SessionFactory();
-        private ISession _session;
+        protected ISession _session = null;
+        protected SessionFactory _factory = null;
 
         public NHibernateTest()
         {
@@ -25,7 +25,7 @@ namespace Vestris.Data.NHibernate.UnitTests
             {
                 if (_session == null)
                 {
-                    _session = _factory.Instance.OpenSession();
+                    _session = Factory.OpenSession();
                 }
 
                 return _session;
@@ -36,10 +36,28 @@ namespace Vestris.Data.NHibernate.UnitTests
             }
         }
 
+        public virtual SessionFactory CreateSessionFactory()
+        {
+            return new SessionFactory(null);
+        }
+
+        public ISessionFactory Factory
+        {
+            get
+            {
+                if (_factory == null)
+                {
+                    _factory = CreateSessionFactory();
+                }
+
+                return _factory.Instance;
+            }
+        }
+
         [SetUp]
         public void SetUp()
         {
-            _session = _factory.Instance.OpenSession();
+            _session = Factory.OpenSession();
         }
 
         [TearDown]

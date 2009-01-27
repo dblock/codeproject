@@ -23,10 +23,21 @@ namespace Vestris.Service.Identity
         /// </summary>
         public DateTime TimeStamp { get { return _timestamp; } }
 
+        protected UserContext()
+        {
+        }
+
         public UserContext(Account account)
         {
             _accountId = account.Id;
-            _timestamp = DateTime.UtcNow;
+        }
+    }
+
+    public class GuestUserContext : UserContext
+    {
+        public GuestUserContext()
+        {
+
         }
     }
 }

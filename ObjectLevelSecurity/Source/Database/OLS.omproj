@@ -46,7 +46,7 @@
                 <MapObjectType>Puzzle.NPersist.Framework.Mapping.ClassMap</MapObjectType>
                 <MapObjectName>Account</MapObjectName>
                 <FileType>CSharp</FileType>
-                <LastWrittenTo>2009-01-22T19:02:52.733-05:00</LastWrittenTo>
+                <LastWrittenTo>2009-01-22T19:08:02.978-05:00</LastWrittenTo>
               </SourceCodeFile>
               <SourceCodeFile>
                 <Name>Account.hbm.xml</Name>
@@ -64,7 +64,7 @@
                 <MapObjectType />
                 <MapObjectName>AssemblyInfo</MapObjectName>
                 <FileType>CSharp</FileType>
-                <LastWrittenTo>2009-01-22T19:02:52.774-05:00</LastWrittenTo>
+                <LastWrittenTo>2009-01-22T19:08:03.01-05:00</LastWrittenTo>
               </SourceCodeFile>
               <SourceCodeFile>
                 <Name>Blog.cs</Name>
@@ -73,7 +73,7 @@
                 <MapObjectType>Puzzle.NPersist.Framework.Mapping.ClassMap</MapObjectType>
                 <MapObjectName>Blog</MapObjectName>
                 <FileType>CSharp</FileType>
-                <LastWrittenTo>2009-01-22T19:02:52.759-05:00</LastWrittenTo>
+                <LastWrittenTo>2009-01-22T19:08:02.989-05:00</LastWrittenTo>
               </SourceCodeFile>
               <SourceCodeFile>
                 <Name>Blog.hbm.xml</Name>
@@ -91,7 +91,7 @@
                 <MapObjectType>Puzzle.NPersist.Framework.Mapping.ClassMap</MapObjectType>
                 <MapObjectName>BlogAuthor</MapObjectName>
                 <FileType>CSharp</FileType>
-                <LastWrittenTo>2009-01-22T19:02:52.762-05:00</LastWrittenTo>
+                <LastWrittenTo>2009-01-22T19:08:02.998-05:00</LastWrittenTo>
               </SourceCodeFile>
               <SourceCodeFile>
                 <Name>BlogAuthor.hbm.xml</Name>
@@ -109,7 +109,7 @@
                 <MapObjectType>Puzzle.NPersist.Framework.Mapping.ClassMap</MapObjectType>
                 <MapObjectName>BlogPost</MapObjectName>
                 <FileType>CSharp</FileType>
-                <LastWrittenTo>2009-01-22T19:02:52.767-05:00</LastWrittenTo>
+                <LastWrittenTo>2009-01-22T19:08:03.006-05:00</LastWrittenTo>
               </SourceCodeFile>
               <SourceCodeFile>
                 <Name>BlogPost.hbm.xml</Name>
