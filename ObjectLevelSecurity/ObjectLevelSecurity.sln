@@ -25,6 +25,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{887EA2
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		Source\OLS.nunit = Source\OLS.nunit
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.Script", "Source\Data.Script\Data.Script.csproj", "{D69FCAC7-47F5-4044-8EDC-167CB3BABBB2}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -71,6 +74,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Identity.UnitTests"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Data", "Source\Service.Data\Service.Data.csproj", "{CB7F8E8F-07A5-4C9E-9FBA-82F5A646FF09}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Data.UnitTests", "Source\Service.Data.UnitTests\Service.Data.UnitTests.csproj", "{49A4E185-992B-4E4F-AEAB-79E54168925E}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +120,14 @@ Global
 		{9769694C-1E04-4941-8488-864C0CCDC8F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9769694C-1E04-4941-8488-864C0CCDC8F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9769694C-1E04-4941-8488-864C0CCDC8F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB7F8E8F-07A5-4C9E-9FBA-82F5A646FF09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB7F8E8F-07A5-4C9E-9FBA-82F5A646FF09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB7F8E8F-07A5-4C9E-9FBA-82F5A646FF09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB7F8E8F-07A5-4C9E-9FBA-82F5A646FF09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49A4E185-992B-4E4F-AEAB-79E54168925E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49A4E185-992B-4E4F-AEAB-79E54168925E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49A4E185-992B-4E4F-AEAB-79E54168925E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49A4E185-992B-4E4F-AEAB-79E54168925E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -117,5 +140,7 @@ Global
 		{40BB88F2-A83F-4FD7-AFA4-C5FA6D89D23B} = {887EA236-6853-4E80-BCFB-C025CB0DDBC6}
 		{00164BE6-95B8-4F21-B833-15BE79900940} = {887EA236-6853-4E80-BCFB-C025CB0DDBC6}
 		{9769694C-1E04-4941-8488-864C0CCDC8F1} = {887EA236-6853-4E80-BCFB-C025CB0DDBC6}
+		{CB7F8E8F-07A5-4C9E-9FBA-82F5A646FF09} = {887EA236-6853-4E80-BCFB-C025CB0DDBC6}
+		{49A4E185-992B-4E4F-AEAB-79E54168925E} = {887EA236-6853-4E80-BCFB-C025CB0DDBC6}
 	EndGlobalSection
 EndGlobal

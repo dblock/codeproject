@@ -24,7 +24,7 @@ namespace Vestris.Service.Data.UnitTests
             Session.Save(account);
             Session.Flush();
             // switch context to self
-            CurrentUserContext = new UserContext(account);
+            SessionManager.CurrentSessionContext = new UserContext(Session, account);
             // the owner can update his own account
             account.Name = Guid.NewGuid().ToString();
             Session.Save(account);
@@ -50,7 +50,7 @@ namespace Vestris.Service.Data.UnitTests
             }
             finally
             {
-                CurrentUserContext = new UserContext(account);
+                SessionManager.CurrentSessionContext = new UserContext(Session, account);
                 Session.Delete(account);
             }
             Session.Flush();

@@ -5,39 +5,21 @@ using Vestris.Data.NHibernate;
 using System.Reflection;
 using NHibernate;
 using Vestris.Service.Identity;
+using Vestris.Service.NHibernate;
 
 namespace Vestris.Service.Data
 {
     public class ServiceDataInterceptor : EmptyInterceptor
     {
-        private UserContext _ctx = null;
-
-        public UserContext UserContext
-        {
-            get
-            {
-                return _ctx;
-            }
-            set
-            {
-                _ctx = value;
-            }
-        }
-
-        public ServiceDataInterceptor(UserContext ctx)
-        {
-            _ctx = ctx;
-        }
-
         public override object Instantiate(Type clazz, object id)
         {
             Console.WriteLine("Instantiate: {0}:{1}", clazz, id);
             return base.Instantiate(clazz, id);
         }
 
-        public override bool OnFlushDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, NHibernate.Type.IType[] types)
+        public override bool OnFlushDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, global::NHibernate.Type.IType[] types)
         {
-            Console.WriteLine("FlushDirty: {0}:{1} (ctx: {2})", entity, id, _ctx.AccountId);
+            Console.WriteLine("FlushDirty: {0}:{1} (ctx: {2})", entity, id, CurrentUserContext.AccountId);
 
             if (entity is IDataObject)
             {
@@ -47,9 +29,17 @@ namespace Vestris.Service.Data
             return base.OnFlushDirty(entity, id, currentState, previousState, propertyNames, types);
         }
 
-        public override bool OnSave(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
+        private UserContext CurrentUserContext
         {
-            Console.WriteLine("Save: {0}:{1} (ctx: {2})", entity, id, _ctx.AccountId);
+            get
+            {
+                return (UserContext)SessionManager.CurrentSessionContext;
+            }
+        }
+
+        public override bool OnSave(object entity, object id, object[] state, string[] propertyNames, global::NHibernate.Type.IType[] types)
+        {
+            Console.WriteLine("Save: {0}:{1} (ctx: {2})", entity, id, CurrentUserContext.AccountId);
             
             if (entity is IDataObject)
             {
@@ -59,9 +49,9 @@ namespace Vestris.Service.Data
             return base.OnSave(entity, id, state, propertyNames, types);
         }
 
-        public override bool OnLoad(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
+        public override bool OnLoad(object entity, object id, object[] state, string[] propertyNames, global::NHibernate.Type.IType[] types)
         {
-            Console.WriteLine("Load: {0}:{1} (ctx: {2})", entity, id, _ctx.AccountId);
+            Console.WriteLine("Load: {0}:{1} (ctx: {2})", entity, id, CurrentUserContext.AccountId);
 
             if (entity is IDataObject)
             {
@@ -71,9 +61,9 @@ namespace Vestris.Service.Data
             return base.OnLoad(entity, id, state, propertyNames, types);
         }
 
-        public override void OnDelete(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
+        public override void OnDelete(object entity, object id, object[] state, string[] propertyNames, global::NHibernate.Type.IType[] types)
         {
-            Console.WriteLine("Delete: {0}:{1} (ctx: {2})", entity, id, _ctx.AccountId);
+            Console.WriteLine("Delete: {0}:{1} (ctx: {2})", entity, id, CurrentUserContext.AccountId);
 
             if (entity is IDataObject)
             {
@@ -90,7 +80,7 @@ namespace Vestris.Service.Data
             Type aclClassType = Assembly.GetExecutingAssembly().GetType(aclClassTypeName, true, false);
             object[] args = { instance };
             ACL acl = (ACL) Activator.CreateInstance(aclClassType, args);
-            acl.Check(_ctx, op);
+            acl.Check(CurrentUserContext, op);
         }
     }
 }

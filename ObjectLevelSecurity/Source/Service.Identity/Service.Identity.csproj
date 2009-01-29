@@ -50,6 +50,10 @@
       <Project>{CAD503EE-8177-4249-9ED4-7CB4499FB69C}</Project>
       <Name>Data.NHibernate</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Service.NHibernate\Service.NHibernate.csproj">
+      <Project>{00164BE6-95B8-4F21-B833-15BE79900940}</Project>
+      <Name>Service.NHibernate</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

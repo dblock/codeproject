@@ -1,0 +1,9 @@
+﻿<NUnitProject>
+  <Settings activeconfig="Debug" />
+  <Config name="Debug" binpathtype="Auto">
+    <assembly path="Data.NHibernate.UnitTests\bin\Debug\Data.NHibernate.UnitTests.dll" />
+    <assembly path="Service.Data.UnitTests\bin\Debug\Service.Data.UnitTests.dll" />
+    <assembly path="Service.Identity.UnitTests\bin\Debug\Service.Identity.UnitTests.dll" />
+  </Config>
+  <Config name="Release" binpathtype="Auto" />
+</NUnitProject>

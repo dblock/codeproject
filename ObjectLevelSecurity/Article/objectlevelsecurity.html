@@ -56,17 +56,237 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
  <h2>
   Introduction
  </h2>
- <p>
- </p>
+  <p>
+   This article introduces a practical and robust architecture for secure services
+   within a Service Oriented Architecture (SOA) model. We will develop a practical
+   implementation of an ACL-based authorization model with NHibernate, at object level.
+   Specifically, we will develop a discretionary access model with an NHibernate interceptor.
+   While simple, this is a very powerful model that provides a secure Data Access Layer
+   (DAL) and a per-class/instance approach.</p>
  <h2>
   Background
  </h2>
  <p>
+  In a typical SOA architecture a caller is first authenticated, a security context
+  is created and is made available through the duration of the request. Many web services
+  will then verify whether this user is allowed to perform a specific action at the
+  web service level.
  </p>
+  <p>
+   For example, in a blogging system we would implement a method called SaveBlogPost
+   and check whether the calling user is an authorized author and throw an exception
+   if otherwise. In a separate call, GetBlogPost would check for read permissions and
+   GetAllBlogPosts would have to iterate through the resulting list and check access.
+   This is an obvious, and in my opinion cumbersome implementation.</p>
+  <p>
+   In contrast, a file system works with ACLs. An Access Control List (ACL) is a list
+   of permissions attached to an object. In an ACL-based security model, when a subject
+   requests to perform an operation on an object, the system first checks the list
+   for an applicable entry in order to decide whether to proceed with the operation.
+   Whether a file is accessed locally, via the network, a web service or COM, the ACL
+   system is responsible for the file's security.</p>
+  <p>
+   How can we carry this ACL-based file system model into a web service?</p>
  <h2>
   Implementation
  </h2>
+ <h3>
+  Object Model
+ </h3>
  <p>
+  We will implement an ACL-based model with NHibernate. I have picked the following
+  simple database object model for a blogging system.</p>
+  <ul>
+   <li>An <strong>Account</strong> that represents an authenticated user. In our system
+    anyone can sign up, ie. create an account.</li>
+   <li>A <strong>Blog </strong>has an account owner and a variable list of authors.
+    In our system any authenticated user can create a blog.</li>
+   <li>A <strong>BlogAuthor</strong> that represents an individual contributor or Account.
+    In our system the blog owner can add or remove contributors. Contributors can choose
+    to stop contributing themselves.</li>
+   <li>A <strong>BlogPost</strong> can be seen by everyone. The blog owner can edit
+    all posts and blog authors can edit their own posts only.</li>
+  </ul>
+  <p>
+   <img src="domainmodel.jpg" />&nbsp;</p>
+  <p>
+   We want to find a programming model where we can represent the requirements above in code. This
+   can be easily extended to a configuration-based model where permissions are described
+   in XML files, which is beyond the scope of this article.</p>
+ <h3>
+  NHibernate Data Layer
+ </h3>
+ <p>
+  Getting the data in and out of the database is a trivial problem in 2009. I have
+  used <a href="http://www.puzzleframework.com">Puzzle Framework</a> to design the
+  domain model, export C# classes for NHibernate (both the .cs class implementations
+  and the .hbm.xml NHibernate mappings). I've also added a generic NHibernateCrudTest unit test that ensures that
+  all CRUD operations (create, retrieve, update and delete) can be made. This is the
+  DAL, without any access control.</p>
+  <p>
+   Here's an example of a Blog class. Note that I have modified the Account property
+   to disallow any update. This is a way of disallowing ownership change for a blog
+   by design.</p>
+ <p>
+  <pre lang="cs">public class Blog: IDataObject
+{
+    private System.Int32 _Id;
+    private Account _Account;
+    private System.Collections.Generic.IList<BlogAuthor> _BlogAuthors;
+    private System.Collections.Generic.IList<BlogPost> _BlogPosts;
+    private System.DateTime _Created;
+    private System.String _Description;
+    private System.String _Name;
+
+    public virtual System.Int32 Id { get { return _Id; } }
+
+    public virtual Account Account
+    {
+        get { return _Account; }
+        set
+        {
+            if (_Account != null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            _Account = value;
+        }
+    }
+
+    public virtual System.Collections.Generic.IList<BlogAuthor> BlogAuthors
+    {
+        get { return _BlogAuthors; }
+        set { _BlogAuthors = value; }
+    }
+
+    public virtual System.Collections.Generic.IList<BlogPost> BlogPosts
+    {
+        get { return _BlogPosts; }
+        set { _BlogPosts = value; }
+    }
+
+    public virtual System.DateTime Created
+    {
+        get { return _Created; }
+        set { _Created = value; }
+    }
+
+    public virtual System.String Description
+    {
+        get { return _Description; }
+        set { _Description = value; }
+    }
+
+    public virtual System.String Name
+    {
+        get { return _Name; }
+        set { _Name = value; }
+    }
+}
+  </pre>
+  The auto-generated NHibernate mapping for a blog class.
+  <pre lang="xml">&lt;?xml version="1.0" encoding="utf-8" ?&gt;
+&lt;hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" schema="dbo"&gt;
+  &lt;class name="Vestris.Data.NHibernate.Blog, Data.NHibernate" table="Blog"&gt;
+    &lt;id name="Id" type="Int32" column="Blog_Id" access="field.pascalcase-underscore"&gt;
+      &lt;generator class="identity" /&gt;
+    &lt;/id&gt;
+    &lt;many-to-one name="Account" column="Account_Id" class="Vestris.Data.NHibernate.Account, Data.NHibernate" /&gt;
+    &lt;bag name="BlogAuthors" inverse="true"&gt;
+      &lt;key column="Blog_Id" /&gt;
+      &lt;one-to-many class="Vestris.Data.NHibernate.BlogAuthor, Data.NHibernate" /&gt;
+    &lt;/bag&gt;
+    &lt;bag name="BlogPosts" inverse="true"&gt;
+      &lt;key column="Blog_Id" /&gt;
+      &lt;one-to-many class="Vestris.Data.NHibernate.BlogPost, Data.NHibernate" /&gt;
+    &lt;/bag&gt;
+    &lt;property name="Created" column="Created" type="DateTime" /&gt;
+    &lt;property name="Description" column="Description" type="String" /&gt;
+    &lt;property name="Name" column="Name" type="String" /&gt;
+  &lt;/class&gt;
+&lt;/hibernate-mapping&gt;
+  </pre>
+ <h3>
+  NHibernate Interceptor
+ </h3>
+ <p>
+  Since our goal is to do authorization at the lowest level possible and at object
+  level we must intercept access to all objects above or below the DAL. An obvious
+  choice is to warp every class in the DAL with a class that implements authentication,
+  but NHibernate offers a much more compelling model by using an <em>interceptor</em>.
+  The IInterceptor interface defines a virtual hook into the CRUD functions. An empty
+  implementation, NHibernate.EmptyInterceptor, is also available and can be derived
+  from. For example, we can now witness the lifetime of all objects on the console.</p>
+  <p>
+   </p>
+   <pre lang="cs">public class ServiceDataInterceptor : EmptyInterceptor
+{
+    // save an existing instance (flush dirty data)
+    public override bool OnFlushDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, NHibernate.Type.IType[] types)
+    {
+        Console.WriteLine("FlushDirty: {0}:{1}", entity, id);
+        return base.OnFlushDirty(entity, id, currentState, previousState, propertyNames, types);
+    }
+
+    // save a new instance
+    public override bool OnSave(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
+    {
+        Console.WriteLine("Save: {0}:{1}", entity, id);
+        return base.OnSave(entity, id, state, propertyNames, types);
+    }
+
+    // load an existing instance
+    public override bool OnLoad(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
+    {
+        Console.WriteLine("Load: {0}:{1}", entity, id);
+        return base.OnLoad(entity, id, state, propertyNames, types);
+    }
+
+    // delete an existing instance
+    public override void OnDelete(object entity, object id, object[] state, string[] propertyNames, NHibernate.Type.IType[] types)
+    {
+        Console.WriteLine("Delete: {0}:{1}", entity, id);
+        base.OnDelete(entity, id, state, propertyNames, types);
+    }
+}    
+   </pre>
+   An interceptor is hooked up to a session factory when the latter is manufactured.
+   <pre lang="cs">public ISessionFactory GetSessionFactory()
+{
+    Configuration cfg = new Configuration();
+    cfg.Properties.Add("hibernate.dialect", "NHibernate.Dialect.MsSql2000Dialect");
+    cfg.Properties.Add("hibernate.connection.provider", "NHibernate.Connection.DriverConnectionProvider");
+    cfg.Properties.Add("hibernate.connection.driver_class", "NHibernate.Driver.SqlClientDriver");
+    cfg.Properties.Add("hibernate.connection.connection_string", "...");
+    cfg.Interceptor = new ServiceDataInterceptor();
+    cfg.AddAssembly("...");
+    return cfg.BuildSessionFactory();
+}
+   </pre>
+ <h3>
+  User Identity
+ </h3>
+ <p>
+  Before we implement any actual authorization we must answer two basic questions:
+  what defines a user and how can we create and carry a security context throughout
+  a session?</p>
+  <p>
+   In this system a user needs to be created first, adding a row to the Account table.
+   I chose to implement an IdentityService that can log-in a user by looking up this
+   record. This service could be easily replaced with another authentication scheme
+   that, for example, logs in a user to Active Directory, then locates a record in
+   the Account table based on the SID. For demonstration purposes both the security
+   context and the identity service are rudimentary, in the "real world" this should
+   be a robust interface-based and pluggable provider implementation.</p>
+  <p>
+   The manufactured security context must now be made available through the lifetime
+   of a request.</p>
+ <h3>
+  Access Control Lists
+ </h3>
+ <p>
+  TODO
  </p>
  <h2>
   Source Code and Patches
@@ -96,6 +316,7 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
   </p>
   <!-------------------------------    That's it!   --------------------------->
  </li>
+  </p>
  </p>
 </body>
 </html>

@@ -36,24 +36,27 @@ namespace Vestris.Service.Data.UnitTests
             Session.Save(blog);
             Session.Flush();
             Account user2 = CreateUser();
-            UserContext saved = CurrentUserContext;
-            try
+            using (new SessionManagerContextPusher(new UserContext(Session, user2)))
             {
-                CurrentUserContext = new UserContext(user2);
-                blog.Description = Guid.NewGuid().ToString();
-                blog.Account = user2;
-                Session.Save(blog);
-                Session.Flush();
-            }
-            finally
-            {
-                Session = null;
-                // delete temp user
-                DeleteUser(user2);
-                // delete blog
-                CurrentUserContext = saved;
-                Session.Delete(blog);
-                Session.Flush();
+                try
+                {
+                    blog.Description = Guid.NewGuid().ToString();
+                    blog.Account = user2;
+                    Session.Save(blog);
+                    Session.Flush();
+                }
+                finally
+                {
+                    Session = null;
+                    // delete temp user
+                    DeleteUser(user2);
+                    using (new SessionManagerContextPusher(new UserContext(Session, blog.Account)))
+                    {
+                        // delete blog
+                        Session.Delete(blog);
+                        Session.Flush();
+                    }
+                }
             }
         }
     }

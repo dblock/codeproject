@@ -35,7 +35,7 @@ namespace Vestris.Service.Identity
                 throw new AccessDeniedException();
             }
 
-            return new UserContext(account);
+            return new UserContext(_session, account);
         }
     }
 }

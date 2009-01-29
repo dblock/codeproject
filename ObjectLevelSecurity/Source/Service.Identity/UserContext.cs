@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using NHibernate;
 using Vestris.Data.NHibernate;
+using Vestris.Service.NHibernate;
 
 namespace Vestris.Service.Identity
 {
     /// <summary>
     /// An authenticated user context.
     /// </summary>
-    public class UserContext
+    public class UserContext : EmptySessionContext
     {
         private int _accountId = 0;
         private DateTime _timestamp = DateTime.UtcNow;
@@ -23,11 +25,14 @@ namespace Vestris.Service.Identity
         /// </summary>
         public DateTime TimeStamp { get { return _timestamp; } }
 
-        protected UserContext()
+        protected UserContext(ISession session)
+            : base(session)
         {
+
         }
 
-        public UserContext(Account account)
+        public UserContext(ISession session, Account account)
+            : base(session)
         {
             _accountId = account.Id;
         }
@@ -35,7 +40,8 @@ namespace Vestris.Service.Identity
 
     public class GuestUserContext : UserContext
     {
-        public GuestUserContext()
+        public GuestUserContext(ISession session)
+            : base(session)
         {
 
         }

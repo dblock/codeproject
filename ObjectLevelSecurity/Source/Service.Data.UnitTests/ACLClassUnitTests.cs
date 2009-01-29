@@ -12,29 +12,21 @@ namespace Vestris.Service.Data.UnitTests
 {
     public class ACLClassUnitTests : NHibernateTest
     {
-        private ServiceDataInterceptor _interceptor = null;
-
-        public override SessionFactory CreateSessionFactory()
-        {
-            return new SessionFactory(_interceptor);
-        }
-
         public override void SetUp()
         {
-            _interceptor = new ServiceDataInterceptor(new GuestUserContext());
+            SessionManager.CurrentSessionContext = new GuestUserContext(Session);
             base.SetUp();
         }
 
-        public UserContext CurrentUserContext
+        public override void TearDown()
         {
-            get
-            {
-                return _interceptor.UserContext;
-            }
-            set
-            {
-                _interceptor.UserContext = value;
-            }
+            base.TearDown();
+            SessionManager.CurrentSessionContext = null;
+        }
+
+        public override SessionFactory CreateSessionFactory()
+        {
+            return new SessionFactory(new ServiceDataInterceptor());
         }
     }
 }
