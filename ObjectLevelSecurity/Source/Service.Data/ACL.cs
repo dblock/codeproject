@@ -229,8 +229,6 @@ namespace Vestris.Service.Data
 
     public class ACL
     {
-        private static ACL s_AdminACL = new ACL();
-
         private List<IACLEntry> _accessControlList = new List<IACLEntry>();
 
         public List<IACLEntry> AccessControlList
@@ -290,6 +288,11 @@ namespace Vestris.Service.Data
             {
                 throw new AccessDeniedException();
             }
+        }
+
+        public void Add(ACL value)
+        {
+            _accessControlList.AddRange(value.AccessControlList);
         }
 
         public void Add(IACLEntry value)

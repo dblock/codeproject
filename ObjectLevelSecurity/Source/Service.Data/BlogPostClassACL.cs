@@ -9,6 +9,8 @@ namespace Vestris.Service.Data
     {
         public BlogPostClassACL(BlogPost instance)
         {
+            // posts have the same permissions as the blog
+            this.Add(new BlogClassACL(instance.Blog));
             // allow the author of the post to do everything with the post
             this.Add(new ACLAccount(instance.Account, DataOperation.AllExceptCreate));
             // allow blog authors to create posts
@@ -19,10 +21,6 @@ namespace Vestris.Service.Data
                     this.Add(new ACLAccount(author.Account, DataOperation.Create));
                 }
             }
-            // allow the blog owner to add/delete/view posts
-            this.Add(new ACLAccount(instance.Blog.Account, DataOperation.All));
-            // allow everyone to get information about this blog post
-            this.Add(new ACLEveryoneAllowRetrieve());
         }
     }
 }
