@@ -43,6 +43,7 @@ namespace Vestris.Service.Data.UnitTests
         public override void SetUp()
         {
             base.SetUp();
+            SessionManager.Initialize(new ThreadSessionSource(), new ServiceDataInterceptor());
             _user = CreateUser();
             SessionManager.CurrentSessionContext = new UserContext(Session, _user);
         }

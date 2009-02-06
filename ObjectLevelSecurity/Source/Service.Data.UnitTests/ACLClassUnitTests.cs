@@ -14,19 +14,15 @@ namespace Vestris.Service.Data.UnitTests
     {
         public override void SetUp()
         {
-            SessionManager.CurrentSessionContext = new GuestUserContext(Session);
             base.SetUp();
+            SessionManager.Initialize(new ThreadSessionSource(), new ServiceDataInterceptor());
+            SessionManager.CurrentSessionContext = new GuestUserContext(Session);
         }
 
         public override void TearDown()
         {
             base.TearDown();
             SessionManager.CurrentSessionContext = null;
-        }
-
-        public override SessionFactory CreateSessionFactory()
-        {
-            return new SessionFactory(new ServiceDataInterceptor());
         }
     }
 }

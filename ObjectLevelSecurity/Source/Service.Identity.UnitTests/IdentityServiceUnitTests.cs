@@ -20,7 +20,6 @@ namespace Vestris.Service.Identity.UnitTests
         public void ValidLoginTest()
         {
             AccountUnitTests _account = new AccountUnitTests();
-            _account.Session = Session;
             _account.Create();
             try
             {

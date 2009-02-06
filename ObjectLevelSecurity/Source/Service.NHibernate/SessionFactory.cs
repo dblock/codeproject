@@ -14,6 +14,10 @@ namespace Vestris.Service.NHibernate
         private ISessionFactory _instance = null;
         private IInterceptor _interceptor = null;
 
+        public SessionFactory()
+        {
+        }
+
         public SessionFactory(IInterceptor interceptor)
         {
             _interceptor = interceptor;

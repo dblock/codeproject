@@ -129,8 +129,6 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
   Here's an example of a <code>Blog</code> class. I have modified the Account property
   to disallow any update, otherwise this is Puzzle-generated code. This is a way of
   disallowing ownership change for a blog by design.</p>
- <p>
- </p>
  <pre lang="cs">public class Blog: IDataObject
 {
     private System.Int32 _Id;
@@ -223,8 +221,6 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
   is also available and can be derived from in order to implement some, rather than
   all methods. For example, we can now witness the lifetime of all objects on the
   console.</p>
- <p>
- </p>
  <pre lang="cs">public class ServiceDataInterceptor : EmptyInterceptor
 {
     // save an existing instance (flush dirty data)
@@ -284,8 +280,6 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
   in the <code>Account</code> table based on the SID. For demonstration purposes both
   the security context and the identity service are rudimentary, in the "real world"
   this should be a robust interface-based and pluggable provider implementation.</p>
- <p>
- </p>
  <pre lang="cs">public class UserContext : EmptySessionContext
 {
     private int _accountId = 0;
@@ -334,12 +328,14 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
  <p>
   The manufactured security context must now be made available through the lifetime
   of a request. The web services model typically exposes a singleton SessionManager.
-  We will need a similar foundation for non-web-based unit tests.</p>
- <p>
- </p>
+  We will need a similar foundation for non-web-based unit tests, possibly 
+  thread-safe.</p>
  <pre lang="cs">public abstract class SessionManager
 {
+    [ThreadStatic]
     private static ISession _currentSession = null;
+    
+    [ThreadStatic]
     private static ISessionContext _currentSessionContext = null;
 
     public static ISession CurrentSession
@@ -355,12 +351,23 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
     }
 }
   </pre>
- A request entry point will manufacture the logged-in user context and any future
- code, including the interceptor performing the data authorization tasks, can obtain
- <code>SessionManager.CurrentSessionContext</code> to work with.
- <h3>
-  Access Control Lists</h3>
  <p>
+  The actual code in the attached demo pushes this further, creating a 
+  SessionSource that can be HTTP or thread-based depending on the current 
+  execution context. This enables a seamless integration in various threading or 
+  pipeline requirements based on <a href="http://wiki.nhibernate.org/display/NH/Using+NHibernate+with+ASP.Net">this idea</a>.</p>
+ <p>
+  The pipeline (eg. NUnit or ASP.NET) will initialize the session manager with the appropriate pipeline context 
+  (http vs. thread) and a data interceptor. Subsequently, it will 
+  manufacture the logged-in user context and any future code, including the 
+  interceptor performing the data authorization tasks, can obtain
+ <code>SessionManager.CurrentSessionContext</code> to work with.
+  The following code initializes SessionManager under NUnit.</p>
+  <pre lang="cs">
+SessionManager.Initialize(new ThreadSessionSource(), new ServiceDataInterceptor()); 
+SessionManager.CurrentSessionContext = new GuestUserContext(Session);  </pre>
+ <h3>
+  Access Control Lists<p>
   An Access Control List (ACL) is a list of permissions attached to an object. Each
   entry defines a <code>DataOperationPermission</code> (a type of data access allowed
   or denied) for a type of <code>DataOperation</code>. An ACL can then render a verdict
@@ -399,7 +406,6 @@ public interface IACLEntry
     ACLVerdict Apply(UserContext ctx, DataOperation op);
 }
    </pre>
- </p>
  <p>
   Does it seem that this should be a boolean <code>Allowed</code> or <code>Denied</code>
   thing? Consider an ACL entry that says that an <code>Account</code> has read access
@@ -414,7 +420,6 @@ public interface IACLEntry
   as well as a generic <code>ACLAccount</code> that assignes a specific permission
   to a specific account. Here's an example of <code>ACLEveryoneAllowRetrieve</code>.
  </p>
- <p>
   <pre lang="cs">public class ACLEveryoneAllowRetrieve : ACLBaseEntry
 {
     public ACLEveryoneAllowRetrieve()
@@ -429,14 +434,12 @@ public interface IACLEntry
     }
 }
   </pre>
- </p>
  <p>
   In general, an <code>ACL</code> is a collection of <code>ACLEntry</code> items and
   implements such methods as <code>Check</code>. The latter will throw an <code>AccessDeniedException</code>
   when the current security context <code>ctx</code> doesn't allow the caller to perform
   an action <code>op</code>.
  </p>
- <p>
   <pre lang="cs">public ACLVerdict Apply(UserContext ctx, DataOperation op)
 {
     ACLVerdict current = ACLVerdict.Denied;
@@ -478,7 +481,6 @@ public void Check(UserContext ctx, DataOperation op)
     }
 }
    </pre>
- </p>
  <h3>
   Applying ACLs to Objects</h3>
  <p>
@@ -492,7 +494,6 @@ public void Check(UserContext ctx, DataOperation op)
   but it might be a good idea to implement ACL members in the auto-generated DAL and
   add ACL methods to the <code>IDataObject</code> interface.
  </p>
- <p>
   <pre lang="cs">public override void OnDelete(object entity, object id, object[] state, string[] propertyNames, global::NHibernate.Type.IType[] types)
 {
     if (entity is IDataObject)
@@ -512,12 +513,10 @@ private void Check(IDataObject instance, DataOperation op)
     acl.Check(CurrentUserContext, op);
 }
    </pre>
- </p>
  <p>
   The implementation of <code>BlogClassACL</code> is meant to be trivial: we will
   have to develop a ClassACL for each data type.
  </p>
- <p>
   <pre lang="cs">public class BlogClassACL : ACL
 {
     public BlogClassACL(Blog instance)
@@ -531,7 +530,6 @@ private void Check(IDataObject instance, DataOperation op)
     }
 }
    </pre>
- </p>
  <p>
   The above code demonstrates immediate advantages: the implementor has access to the actual
   object and can derive an ACL from it. It is very readable and describes naturally
@@ -539,7 +537,6 @@ private void Check(IDataObject instance, DataOperation op)
   penalty. In addition, it is possible to "inherit" ACLs as in the following example
   of a <code>BlogPostClassACL</code>.
  </p>
- <p>
   <pre lang="cs">public class BlogPostClassACL : ACL
 {
     public BlogPostClassACL(BlogPost instance)
@@ -559,8 +556,10 @@ private void Check(IDataObject instance, DataOperation op)
     }
 }    
    </pre>
- </p>
- <h2>Web Services</h2>
+ You have to be careful with inehritance. The above code is actually wrong. The 
+ blog&#39;s ACL allows any authenticated user to create a blog. Inheriting the ACL 
+ means that any user can create a post, which is incorrect - only blog owner or 
+ blog authors can create posts.<h2>Web Services</h2>
  <p>
   TODO
  </p>
