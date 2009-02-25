@@ -19,7 +19,7 @@ namespace Vestris.Service.Data.UnitTests
 
         protected Account CreateUser()
         {
-            using (new SessionManagerContextPusher(new GuestUserContext()))
+            using (new Impersonator(new GuestUserContext()))
             {
                 Account instance = new Account();
                 instance.Created = DateTime.UtcNow;
@@ -33,7 +33,7 @@ namespace Vestris.Service.Data.UnitTests
 
         public void DeleteUser(Account instance)
         {
-            using (new SessionManagerContextPusher(new UserContext(instance)))
+            using (new Impersonator(new UserContext(instance)))
             {
                 Session.Delete(instance);
                 Session.Flush();

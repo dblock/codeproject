@@ -5,12 +5,12 @@ using NHibernate;
 
 namespace Vestris.Service.NHibernate
 {
-    public class SessionManagerContextPusher : IDisposable
+    public class Impersonator : IDisposable
     {
         private ISessionContext _previousCtx = null;
         private ISession _previousSession = null;
 
-        public SessionManagerContextPusher(ISessionContext newContext)
+        public Impersonator(ISessionContext newContext)
         {
             _previousCtx = SessionManager.CurrentSessionContext;
             _previousSession = SessionManager.CurrentSession;

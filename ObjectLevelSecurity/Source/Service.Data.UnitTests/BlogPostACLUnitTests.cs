@@ -29,7 +29,7 @@ namespace Vestris.Service.Data.UnitTests
 
         public void DeleteBlog(Blog instance)
         {
-            using (new SessionManagerContextPusher(new UserContext(instance.Account)))
+            using (new Impersonator(new UserContext(instance.Account)))
             {
                 Blog instanceCopy = Session.Load<Blog>(instance.Id);
                 Session.Delete(instanceCopy);
@@ -82,7 +82,7 @@ namespace Vestris.Service.Data.UnitTests
             {
                 Account user2 = CreateUser();
                 // another user cannot read posts, he's not a blog author
-                using (new SessionManagerContextPusher(new UserContext(user2)))
+                using (new Impersonator(new UserContext(user2)))
                 {
                     BlogPost postCopy = Session.Load<BlogPost>(post.Id);
                     // if you don't resolve a field an object proxy is loaded
@@ -105,7 +105,7 @@ namespace Vestris.Service.Data.UnitTests
         public void TestCreateAccessDenied()
         {
             Account user2 = CreateUser();
-            using (new SessionManagerContextPusher(new UserContext(user2)))
+            using (new Impersonator(new UserContext(user2)))
             {
                 try
                 {

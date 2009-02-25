@@ -25,7 +25,7 @@ namespace Vestris.Service.Data.UnitTests
             Session.Flush();
 
             // switch context to self and delete the account, this can be done by the account owner himself
-            using (new SessionManagerContextPusher(new UserContext(account)))
+            using (new Impersonator(new UserContext(account)))
             {
                 Account accountCopy = Session.Load<Account>(account.Id);
                 // the owner can update his own account
@@ -56,7 +56,7 @@ namespace Vestris.Service.Data.UnitTests
             }
             finally
             {
-                using (new SessionManagerContextPusher(new UserContext(account)))
+                using (new Impersonator(new UserContext(account)))
                 {
                     Account accountCopy = Session.Load<Account>(account.Id);
                     Session.Delete(accountCopy);

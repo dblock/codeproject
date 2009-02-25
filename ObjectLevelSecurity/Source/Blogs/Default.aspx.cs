@@ -16,9 +16,18 @@ public partial class _Default : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        // get the current user
+        Page.RegisterHiddenField("__EVENTTARGET", "ctl00$ContentPlaceHolder1$createBlog");
         IdentityServiceMembershipUser user = (IdentityServiceMembershipUser) Membership.GetUser();
-        labelUserContext.Text = user.UserName;
+        labelBlogs.Text = string.Format("{0}'s Blogs", user.UserName);
+        GetBlogs();
+    }
+
+    public void linkDelete_Command(object sender, CommandEventArgs e)
+    {
+        int id = int.Parse(e.CommandArgument.ToString());
+        Blog blog = SessionManager.CurrentSession.Load<Blog>(id);
+        SessionManager.CurrentSession.Delete(blog);
+        SessionManager.CurrentSession.Flush();
         GetBlogs();
     }
 

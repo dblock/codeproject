@@ -1,0 +1,6 @@
+﻿body { color: #000000; font-family: Arial; font-size: 75%; }    
+a { font-family: Arial; text-decoration: none; }
+table { border: solid 1px black; width: 600px; padding: 5px 5px 5px 5px; margin: 5px 5px 5px 5px; }
+td { border: solid 1px black; }
+.form { width: 600px; padding: 5px 5px 5px 5px; margin: 5px 5px 5px 5px; border: solid 1px black; }
+.button { font-family: Arial; }

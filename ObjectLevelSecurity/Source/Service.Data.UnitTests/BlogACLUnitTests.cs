@@ -37,7 +37,7 @@ namespace Vestris.Service.Data.UnitTests
             Session.Flush();
 
             Account user2 = CreateUser();
-            using (new SessionManagerContextPusher(new UserContext(user2)))
+            using (new Impersonator(new UserContext(user2)))
             {
                 try
                 {
@@ -50,7 +50,7 @@ namespace Vestris.Service.Data.UnitTests
                 {
                     // delete temp user
                     DeleteUser(user2);
-                    using (new SessionManagerContextPusher(new UserContext(blog.Account)))
+                    using (new Impersonator(new UserContext(blog.Account)))
                     {
                         // delete blog
                         Blog blogCopy = Session.Load<Blog>(blog.Id);

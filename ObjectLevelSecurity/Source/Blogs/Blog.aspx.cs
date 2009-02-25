@@ -18,11 +18,22 @@ public partial class BlogPage : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+        Page.RegisterHiddenField("__EVENTTARGET", "ctl00$ContentPlaceHolder1$createBlogPost");
+
         Blog blog = SessionManager.CurrentSession.Load<Blog>(
             Int32.Parse(Request["id"]));
 
         blogName.Text = Title = blog.Name;
 
+        GetBlogPosts();
+    }
+
+    public void linkDelete_Command(object sender, CommandEventArgs e)
+    {
+        int id = int.Parse(e.CommandArgument.ToString());
+        BlogPost blogPost = SessionManager.CurrentSession.Load<BlogPost>(id);
+        SessionManager.CurrentSession.Delete(blogPost);
+        SessionManager.CurrentSession.Flush();
         GetBlogPosts();
     }
 
