@@ -7,7 +7,6 @@ namespace Vestris.Service.NHibernate
 {
     public interface ISessionContext
     {
-        ISession Session { get; }
     }
 
     /// <summary>
@@ -15,19 +14,8 @@ namespace Vestris.Service.NHibernate
     /// </summary>
     public class EmptySessionContext : ISessionContext
     {
-        private ISession _session;
-
-        public EmptySessionContext(ISession session)
+        public EmptySessionContext()
         {
-            _session = session;
-        }
-
-        public ISession Session
-        {
-            get
-            {
-                return _session;
-            }
         }
     }
 }

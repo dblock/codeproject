@@ -11,30 +11,16 @@ namespace Vestris.Service.Data
 {
     public class ServiceDataInterceptor : EmptyInterceptor
     {
-        public override object Instantiate(Type clazz, object id)
-        {
-            Console.WriteLine("Instantiate: {0}:{1}", clazz, id);
-            return base.Instantiate(clazz, id);
-        }
-
         public override bool OnFlushDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, global::NHibernate.Type.IType[] types)
         {
             Console.WriteLine("FlushDirty: {0}:{1} (ctx: {2})", entity, id, CurrentUserContext.AccountId);
 
             if (entity is IDataObject)
             {
-                Check((IDataObject)entity, DataOperation.Update);
+                ServiceDataAuthorizationConnector.Check((IDataObject)entity, DataOperation.Update);
             }
 
             return base.OnFlushDirty(entity, id, currentState, previousState, propertyNames, types);
-        }
-
-        private UserContext CurrentUserContext
-        {
-            get
-            {
-                return (UserContext)SessionManager.CurrentSessionContext;
-            }
         }
 
         public override bool OnSave(object entity, object id, object[] state, string[] propertyNames, global::NHibernate.Type.IType[] types)
@@ -43,7 +29,7 @@ namespace Vestris.Service.Data
             
             if (entity is IDataObject)
             {
-                Check((IDataObject)entity, DataOperation.Create);
+                ServiceDataAuthorizationConnector.Check((IDataObject)entity, DataOperation.Create);
             }
 
             return base.OnSave(entity, id, state, propertyNames, types);
@@ -55,7 +41,7 @@ namespace Vestris.Service.Data
 
             if (entity is IDataObject)
             {
-                Check((IDataObject)entity, DataOperation.Retreive);
+                ServiceDataAuthorizationConnector.Check((IDataObject)entity, DataOperation.Retreive);
             }
 
             return base.OnLoad(entity, id, state, propertyNames, types);
@@ -67,20 +53,19 @@ namespace Vestris.Service.Data
 
             if (entity is IDataObject)
             {
-                Check((IDataObject)entity, DataOperation.Delete);
+                ServiceDataAuthorizationConnector.Check((IDataObject)entity, DataOperation.Delete);
             }
 
             base.OnDelete(entity, id, state, propertyNames, types);
         }
 
-        private void Check(IDataObject instance, DataOperation op)
+
+        private UserContext CurrentUserContext
         {
-            // create an instance of an ACL
-            string aclClassTypeName = string.Format("Vestris.Service.Data.{0}ClassACL", instance.GetType().Name);            
-            Type aclClassType = Assembly.GetExecutingAssembly().GetType(aclClassTypeName, true, false);
-            object[] args = { instance };
-            ACL acl = (ACL) Activator.CreateInstance(aclClassType, args);
-            acl.Check(CurrentUserContext, op);
+            get
+            {
+                return (UserContext)SessionManager.CurrentSessionContext;
+            }
         }
     }
 }

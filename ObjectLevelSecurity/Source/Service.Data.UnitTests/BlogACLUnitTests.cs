@@ -35,8 +35,9 @@ namespace Vestris.Service.Data.UnitTests
             blog.Name = Guid.NewGuid().ToString();
             Session.Save(blog);
             Session.Flush();
+
             Account user2 = CreateUser();
-            using (new SessionManagerContextPusher(new UserContext(Session, user2)))
+            using (new SessionManagerContextPusher(new UserContext(user2)))
             {
                 try
                 {
@@ -47,13 +48,13 @@ namespace Vestris.Service.Data.UnitTests
                 }
                 finally
                 {
-                    Session = null;
                     // delete temp user
                     DeleteUser(user2);
-                    using (new SessionManagerContextPusher(new UserContext(Session, blog.Account)))
+                    using (new SessionManagerContextPusher(new UserContext(blog.Account)))
                     {
                         // delete blog
-                        Session.Delete(blog);
+                        Blog blogCopy = Session.Load<Blog>(blog.Id);
+                        Session.Delete(blogCopy);
                         Session.Flush();
                     }
                 }

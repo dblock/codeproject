@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Vestris.Data.NHibernate;
 using NHibernate;
-using NHibernate.Expression;
+using NHibernate.Criterion;
 
 namespace Vestris.Service.Identity
 {
@@ -41,7 +41,7 @@ namespace Vestris.Service.Identity
 
             if (account != null)
             {
-                ctx = new UserContext(_session, account);
+                ctx = new UserContext(account);
                 return true;
             }
 

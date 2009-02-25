@@ -2,11 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Vestris.Data.NHibernate;
+using Vestris.Service.NHibernate;
 
 namespace Vestris.Service.Data
 {
     public class BlogPostClassACL : ACL
     {
+        /// <summary>
+        /// Blog owners have full access to posts.
+        /// The author of the post has full access to the post.
+        /// Blog authors can create posts.
+        /// </summary>
+        /// <param name="instance"></param>
         public BlogPostClassACL(BlogPost instance)
         {
             // allow the blog owner to do everything with the post

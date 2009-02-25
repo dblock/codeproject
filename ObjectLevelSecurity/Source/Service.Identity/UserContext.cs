@@ -25,14 +25,12 @@ namespace Vestris.Service.Identity
         /// </summary>
         public DateTime TimeStamp { get { return _timestamp; } }
 
-        protected UserContext(ISession session)
-            : base(session)
+        public UserContext()
         {
-
+            _accountId = 0;
         }
 
-        public UserContext(ISession session, Account account)
-            : base(session)
+        public UserContext(Account account)
         {
             _accountId = account.Id;
         }
@@ -40,10 +38,8 @@ namespace Vestris.Service.Identity
 
     public class GuestUserContext : UserContext
     {
-        public GuestUserContext(ISession session)
-            : base(session)
+        public GuestUserContext()
         {
-
         }
     }
 }

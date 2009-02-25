@@ -6,7 +6,7 @@ using System.Web.SessionState;
 using System.Reflection;
 using System.Diagnostics;
 using NHibernate;
-using NHibernate.Expression;
+using NHibernate.Criterion;
 using System.Configuration;
 using System.Web.Configuration;
 using System.Web.Hosting;
@@ -19,7 +19,7 @@ public class Global : HttpApplication
 {
     public void Application_Start(Object sender, EventArgs e)
     {
-        SessionManager.Initialize(new HttpSessionSource(), new ServiceDataInterceptor());
+        SessionManager.Initialize(new HttpSessionSource(), ServiceDataEventListeners.Instance);
     }
 
     public void Application_BeginRequest(Object sender, EventArgs e)
@@ -37,13 +37,11 @@ public class Global : HttpApplication
         IdentityServiceMembershipUser user = (IdentityServiceMembershipUser) Membership.GetUser();
         if (user == null || user.Account == null)
         {
-            SessionManager.CurrentSessionContext = new GuestUserContext(
-                SessionManager.Current);
+            SessionManager.CurrentSessionContext = new GuestUserContext();
         }
         else
         {
-            SessionManager.CurrentSessionContext = new UserContext(
-                SessionManager.Current, user.Account);
+            SessionManager.CurrentSessionContext = new UserContext(user.Account);
         }
     }
 }

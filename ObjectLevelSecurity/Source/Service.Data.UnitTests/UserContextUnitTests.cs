@@ -19,7 +19,7 @@ namespace Vestris.Service.Data.UnitTests
 
         protected Account CreateUser()
         {
-            using (new SessionManagerContextPusher(new GuestUserContext(Session)))
+            using (new SessionManagerContextPusher(new GuestUserContext()))
             {
                 Account instance = new Account();
                 instance.Created = DateTime.UtcNow;
@@ -33,7 +33,7 @@ namespace Vestris.Service.Data.UnitTests
 
         public void DeleteUser(Account instance)
         {
-            using (new SessionManagerContextPusher(new UserContext(Session, instance)))
+            using (new SessionManagerContextPusher(new UserContext(instance)))
             {
                 Session.Delete(instance);
                 Session.Flush();
@@ -43,16 +43,16 @@ namespace Vestris.Service.Data.UnitTests
         public override void SetUp()
         {
             base.SetUp();
-            SessionManager.Initialize(new ThreadSessionSource(), new ServiceDataInterceptor());
+            SessionManager.Initialize(new ThreadSessionSource(), ServiceDataEventListeners.Instance);
             _user = CreateUser();
-            SessionManager.CurrentSessionContext = new UserContext(Session, _user);
+            SessionManager.CurrentSessionContext = new UserContext(_user);
         }
 
         public override void TearDown()
         {
             DeleteUser(_user);
             _user = null;
-            SessionManager.CurrentSessionContext = new GuestUserContext(Session);
+            SessionManager.CurrentSessionContext = new GuestUserContext();
             base.TearDown();
         }
     }

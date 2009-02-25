@@ -20,14 +20,41 @@ scripts and style sheets.
 <head>
  <title>The Code Project</title>
  <style>
-BODY, P, TD { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt }
-H2,H3,H4,H5 { color: #ff9900; font-weight: bold; }
-H2 { font-size: 13pt; }
-H3 { font-size: 12pt; }
-H4 { font-size: 10pt; color: black; }
-PRE { BACKGROUND-COLOR: #FBEDBB; FONT-FAMILY: "Courier New", Courier, mono; WHITE-SPACE: pre; }
-CODE { COLOR: #990000; FONT-FAMILY: "Courier New", Courier, mono; }
-</style>
+  BODY, P, TD
+  {
+   font-family: Verdana, Arial, Helvetica, sans-serif;
+   font-size: 10pt;
+  }
+  H2, H3, H4, H5
+  {
+   color: #ff9900;
+   font-weight: bold;
+  }
+  H2
+  {
+   font-size: 13pt;
+  }
+  H3
+  {
+   font-size: 12pt;
+  }
+  H4
+  {
+   font-size: 10pt;
+   color: black;
+  }
+  PRE
+  {
+   background-color: #FBEDBB;
+   font-family: "Courier New" , Courier, mono;
+   white-space: pre;
+  }
+  CODE
+  {
+   color: #990000;
+   font-family: "Courier New" , Courier, mono;
+  }
+ </style>
  <link rel="stylesheet" type="text/css" href="http://www.codeproject.com/styles/global.css">
 </head>
 <body bgcolor="#FFFFFF" color="#000000">
@@ -133,7 +160,8 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
 {
     private System.Int32 _Id;
     private Account _Account;
-    private System.Collections.Generic.IList<blogauthor> _BlogAuthors;
+    private System.Collections.Generic.IList
+<blogauthor> _BlogAuthors;
     private System.Collections.Generic.IList<BlogPost> _BlogPosts;
     private System.DateTime _Created;
     private System.String _Description;
@@ -256,15 +284,43 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
  <pre lang="cs">public ISessionFactory GetSessionFactory()
 {
     Configuration cfg = new Configuration();
-    cfg.Properties.Add("hibernate.dialect", "NHibernate.Dialect.MsSql2000Dialect");
-    cfg.Properties.Add("hibernate.connection.provider", "NHibernate.Connection.DriverConnectionProvider");
-    cfg.Properties.Add("hibernate.connection.driver_class", "NHibernate.Driver.SqlClientDriver");
-    cfg.Properties.Add("hibernate.connection.connection_string", "...");
+    cfg.Properties.Add("dialect", "NHibernate.Dialect.MsSql2000Dialect");
+    cfg.Properties.Add("connection.provider", "NHibernate.Connection.DriverConnectionProvider");
+    cfg.Properties.Add("connection.driver_class", "NHibernate.Driver.SqlClientDriver");
+    cfg.Properties.Add("connection.connection_string", "...");
     cfg.Interceptor = new ServiceDataInterceptor();
     cfg.AddAssembly("...");
     return cfg.BuildSessionFactory();
+}  </pre>
+ <h3>
+  NHibernate Events</h3>
+ <p>
+  Another way of hooking up to the NHibernate pipeline is with event listeners. This
+  is a more detailed framework than an interceptor since almost every <code>ISession</code>
+  method has a corresponding event. It is possible to configure a session factory
+  with a number of listeners at runtime.</p>
+ <pre lang="cs">
+private T[] Insert&lt;T&gt;(T[] listeners, T instance)
+{
+    if (instance == null)
+        return listeners;
+
+    List&lt;T&gt; newListeners = new List&lt;T&gt;();
+    newListeners.Add(instance);
+    newListeners.AddRange(listeners);
+    return newListeners.ToArray();
 }
-   </pre>
+
+...
+
+cfg.EventListeners.PostLoadEventListeners = Insert(cfg.EventListeners.PostLoadEventListeners, 
+    new MyPostLoadEventListener());</pre>
+ <p>
+  It's also the only way to access an object after it has been loaded as opposed to
+  an interceptor that seeks to capture properties before an instance is modified in
+  any way. As you will see below with ACLs, this limitation of interceptors makes
+  it useless for our purposes, we will hence use the event system.
+ </p>
  <h3>
   User Identity
  </h3>
@@ -328,8 +384,7 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
  <p>
   The manufactured security context must now be made available through the lifetime
   of a request. The web services model typically exposes a singleton SessionManager.
-  We will need a similar foundation for non-web-based unit tests, possibly 
-  thread-safe.</p>
+  We will need a similar foundation for non-web-based unit tests, possibly thread-safe.</p>
  <pre lang="cs">public abstract class SessionManager
 {
     [ThreadStatic]
@@ -352,29 +407,28 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
 }
   </pre>
  <p>
-  The actual code in the attached demo pushes this further, creating a 
-  SessionSource that can be HTTP or thread-based depending on the current 
-  execution context. This enables a seamless integration in various threading or 
-  pipeline requirements based on <a href="http://wiki.nhibernate.org/display/NH/Using+NHibernate+with+ASP.Net">this idea</a>.</p>
+  The actual code in the attached demo pushes this further, creating a SessionSource
+  that can be HTTP or thread-based depending on the current execution context. This
+  enables a seamless integration in various threading or pipeline requirements based
+  on <a href="http://wiki.nhibernate.org/display/NH/Using+NHibernate+with+ASP.Net">
+   this idea</a>.</p>
  <p>
-  The pipeline (eg. NUnit or ASP.NET) will initialize the session manager with the appropriate pipeline context 
-  (http vs. thread) and a data interceptor. Subsequently, it will 
-  manufacture the logged-in user context and any future code, including the 
-  interceptor performing the data authorization tasks, can obtain
- <code>SessionManager.CurrentSessionContext</code> to work with.
-  The following code initializes SessionManager under NUnit.</p>
-  <pre lang="cs">
-SessionManager.Initialize(new ThreadSessionSource(), new ServiceDataInterceptor()); 
+  The pipeline (eg. NUnit or ASP.NET) will initialize the session manager with the
+  appropriate pipeline context (http vs. thread) and a data interceptor. Subsequently,
+  it will manufacture the logged-in user context and any future code, including the
+  interceptor performing the data authorization tasks, can obtain <code>SessionManager.CurrentSessionContext</code>
+  to work with. The following code initializes SessionManager under NUnit.</p>
+ <pre lang="cs">
+SessionManager.Initialize(new ThreadSessionSource(), ServiceDataEventListeners.Instance); 
 SessionManager.CurrentSessionContext = new GuestUserContext(Session);  </pre>
  <h3>
   Access Control Lists<p>
-  An Access Control List (ACL) is a list of permissions attached to an object. Each
-  entry defines a <code>DataOperationPermission</code> (a type of data access allowed
-  or denied) for a type of <code>DataOperation</code>. An ACL can then render a verdict
-  on whether the calling user may or may not access the object to which the ACL is
-  attached to.
- </p>
- <p>
+   An Access Control List (ACL) is a list of permissions attached to an object. Each
+   entry defines a <code>DataOperationPermission</code> (a type of data access allowed
+   or denied) for a type of <code>DataOperation</code>. An ACL can then render a verdict
+   on whether the calling user may or may not access the object to which the ACL is
+   attached to.
+  </p>
   <pre lang="cs">public enum DataOperation
 {
     None = 0,
@@ -406,20 +460,20 @@ public interface IACLEntry
     ACLVerdict Apply(UserContext ctx, DataOperation op);
 }
    </pre>
- <p>
-  Does it seem that this should be a boolean <code>Allowed</code> or <code>Denied</code>
-  thing? Consider an ACL entry that says that an <code>Account</code> has read access
-  to a <code>Blog</code>. This says nothing about whether another account has access
-  to the same blog, producing a <code>None</code> verdict. In a system that denies
-  access by default (an ACL must allow access explicitly), a <code>None</code> verdict
-  over all entries in an ACL means that access is denied.
- </p>
- <p>
-  With a base <code>ACLBaseEntry</code>, we can specialize a number of ACL entries,
-  including <code>ACLEveryoneAllowRetrieve</code>, <code>ACLEveryoneAllowCreate</code>,
-  as well as a generic <code>ACLAccount</code> that assignes a specific permission
-  to a specific account. Here's an example of <code>ACLEveryoneAllowRetrieve</code>.
- </p>
+  <p>
+   Does it seem that this should be a boolean <code>Allowed</code> or <code>Denied</code>
+   thing? Consider an ACL entry that says that an <code>Account</code> has read access
+   to a <code>Blog</code>. This says nothing about whether another account has access
+   to the same blog, producing a <code>None</code> verdict. In a system that denies
+   access by default (an ACL must allow access explicitly), a <code>None</code> verdict
+   over all entries in an ACL means that access is denied.
+  </p>
+  <p>
+   With a base <code>ACLBaseEntry</code>, we can specialize a number of ACL entries,
+   including <code>ACLEveryoneAllowRetrieve</code>, <code>ACLEveryoneAllowCreate</code>,
+   as well as a generic <code>ACLAccount</code> that assignes a specific permission
+   to a specific account. Here's an example of <code>ACLEveryoneAllowRetrieve</code>.
+  </p>
   <pre lang="cs">public class ACLEveryoneAllowRetrieve : ACLBaseEntry
 {
     public ACLEveryoneAllowRetrieve()
@@ -434,12 +488,12 @@ public interface IACLEntry
     }
 }
   </pre>
- <p>
-  In general, an <code>ACL</code> is a collection of <code>ACLEntry</code> items and
-  implements such methods as <code>Check</code>. The latter will throw an <code>AccessDeniedException</code>
-  when the current security context <code>ctx</code> doesn't allow the caller to perform
-  an action <code>op</code>.
- </p>
+  <p>
+   In general, an <code>ACL</code> is a collection of <code>ACLEntry</code> items and
+   implements such methods as <code>Check</code>. The latter will throw an <code>AccessDeniedException</code>
+   when the current security context <code>ctx</code> doesn't allow the caller to perform
+   an action <code>op</code>.
+  </p>
   <pre lang="cs">public ACLVerdict Apply(UserContext ctx, DataOperation op)
 {
     ACLVerdict current = ACLVerdict.Denied;
@@ -481,42 +535,53 @@ public void Check(UserContext ctx, DataOperation op)
     }
 }
    </pre>
- <h3>
-  Applying ACLs to Objects</h3>
- <p>
-  An ACL applies to an instance of an object. For example, given a <code>Blog</code>
-  we need a <code>BlogACL</code> that inherits from <code>ACL</code>. I chose a simple
-  construct of manufacturing an instance of an ACL from an instance of an NHibernate
-  data class via reflection, by name. The following method is implemented in the data
-  interceptor and will check access when deleting any instance of <code>IDataObject</code>
-  by manufacturing a <code>BlogClassACL</code> for an instance of a <code>Blog</code>.
-  By using reflection I have separated authorization classes from NHibernate data,
-  but it might be a good idea to implement ACL members in the auto-generated DAL and
-  add ACL methods to the <code>IDataObject</code> interface.
- </p>
-  <pre lang="cs">public override void OnDelete(object entity, object id, object[] state, string[] propertyNames, global::NHibernate.Type.IType[] types)
+  <h3>
+   Applying ACLs to Objects</h3>
+  <p>
+   An ACL applies to an instance of an object. For example, given a <code>Blog</code>
+   we need a <code>BlogACL</code> that inherits from <code>ACL</code>. I chose a simple
+   construct of manufacturing an instance of an ACL from an instance of an NHibernate
+   data class via reflection, by name.
+  </p>
+  <pre lang="cs">
+public abstract class ServiceDataAuthorizationConnector
 {
-    if (entity is IDataObject)
+    public static void Check(IDataObject instance, DataOperation op)
     {
-        Check((IDataObject)entity, DataOperation.Delete);
+        string aclClassTypeName = string.Format("Vestris.Service.Data.{0}ClassACL", instance.GetType().Name);            
+        Type aclClassType = Assembly.GetExecutingAssembly().GetType(aclClassTypeName, true, false);
+        object[] args = { instance };
+        ACL acl = (ACL) Activator.CreateInstance(aclClassType, args);
+        acl.Check(CurrentUserContext, op);
     }
-
-    base.OnDelete(entity, id, state, propertyNames, types);
-}
-   
-private void Check(IDataObject instance, DataOperation op)
-{
-    string aclClassTypeName = string.Format("Vestris.Service.Data.{0}ClassACL", instance.GetType().Name);            
-    Type aclClassType = Assembly.GetExecutingAssembly().GetType(aclClassTypeName, true, false);
-    object[] args = { instance };
-    ACL acl = (ACL) Activator.CreateInstance(aclClassType, args);
-    acl.Check(CurrentUserContext, op);
 }
    </pre>
- <p>
-  The implementation of <code>BlogClassACL</code> is meant to be trivial: we will
-  have to develop a ClassACL for each data type.
- </p>
+  <p>
+   The following method is implemented in the post-load event listener and will check
+   access when loading any instance of <code>IDataObject</code> by manufacturing a
+   <code>BlogClassACL</code> for an instance of a <code>Blog</code>. By using reflection
+   I have separated authorization classes from NHibernate data, but it might be a good
+   idea to implement ACL members in the auto-generated DAL and add ACL methods to the
+   <code>IDataObject</code> interface.
+  </p>
+  <pre lang="cs">
+public class ServiceDataPostLoadEventListener : IPostLoadEventListener
+{
+    public void OnPostLoad(PostLoadEvent @event)
+    {
+        Debug.WriteLine(string.Format("OnPostLoad - {0}", @event.Entity));
+        if (@event.Entity is IDataObject)
+        {
+            ServiceDataAuthorizationConnector.Check((IDataObject) @event.Entity, 
+                DataOperation.Retreive);
+        }
+    }
+}
+</pre>
+  <p>
+   The implementation of <code>BlogClassACL</code> is meant to be trivial: we will
+   have to develop a ClassACL for each data type.
+  </p>
   <pre lang="cs">public class BlogClassACL : ACL
 {
     public BlogClassACL(Blog instance)
@@ -530,13 +595,13 @@ private void Check(IDataObject instance, DataOperation op)
     }
 }
    </pre>
- <p>
-  The above code demonstrates immediate advantages: the implementor has access to the actual
-  object and can derive an ACL from it. It is very readable and describes naturally
-  who has access to an instance of a <code>Blog</code> in exchange of a small performance
-  penalty. In addition, it is possible to "inherit" ACLs as in the following example
-  of a <code>BlogPostClassACL</code>.
- </p>
+  <p>
+   The above code demonstrates immediate advantages: the implementor has access to
+   the actual object and can derive an ACL from it. It is very readable and describes
+   naturally who has access to an instance of a <code>Blog</code> in exchange of a
+   small performance penalty. In addition, it is possible to "inherit" ACLs as in the
+   following example of a <code>BlogPostClassACL</code>.
+  </p>
   <pre lang="cs">public class BlogPostClassACL : ACL
 {
     public BlogPostClassACL(BlogPost instance)
@@ -556,36 +621,39 @@ private void Check(IDataObject instance, DataOperation op)
     }
 }    
    </pre>
- You have to be careful with inehritance. The above code is actually wrong. The 
- blog&#39;s ACL allows any authenticated user to create a blog. Inheriting the ACL 
- means that any user can create a post, which is incorrect - only blog owner or 
- blog authors can create posts.<h2>Web Services</h2>
- <p>
-  TODO
- </p>
- <h2>
-  Source Code and Patches</h2>
- <p>
-  The latest version of this article and source code can always be found in <a href="http://subversion.tigris.org/">
-   Subversion</a> under <a href="svn://svn.vestris.com/codeproject/ObjectLevelSecurity/">
-    svn://svn.vestris.com/codeproject/ObjectLevelSecurity</a>. You can also <a href="http://svn.vestris.com/listing.php?repname=Vestris+SVN&path=%2Fcodeproject%2FObjectLevelSecurity%2FSource%2F#_codeproject_ObjectLevelSecurity_Source_">
-     browse the source code</a>. You can find the latest information about this project
-  at <a href="http://code.dblock.org">code.dblock.org</a>.</p>
- <h2>
-  History
- </h2>
- <p>
- </p>
+  <p>
+   You must be careful with inehritance. The above code is actually wrong. The blog&#39;s
+   ACL allows any authenticated user to create a blog. Inheriting the ACL means that
+   any user can create a post, which is incorrect - only blog owner or blog authors
+   can create posts.</p>
+  <h2>
+   Web Services</h2>
+  <p>
+   TODO
+  </p>
+  <h2>
+   Source Code and Patches</h2>
+  <p>
+   The latest version of this article and source code can always be found in <a href="http://subversion.tigris.org/">
+    Subversion</a> under <a href="svn://svn.vestris.com/codeproject/ObjectLevelSecurity/">
+     svn://svn.vestris.com/codeproject/ObjectLevelSecurity</a>. You can also <a href="http://svn.vestris.com/listing.php?repname=Vestris+SVN&path=%2Fcodeproject%2FObjectLevelSecurity%2FSource%2F#_codeproject_ObjectLevelSecurity_Source_">
+      browse the source code</a>. You can find the latest information about this project
+   at <a href="http://code.dblock.org">code.dblock.org</a>.</p>
+  <h2>
+   History
+  </h2>
+  <p>
+  </p>
   <li>01/21/2009: initial version
- <h2>
-  License
- </h2>
- <p>
-  This library, along with any associated source code and files, is published under
-  the <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a> license, please
-  reuse.
- </p>
- <!-------------------------------    That's it!   --------------------------->
-</li>
+   <h2>
+    License
+   </h2>
+   <p>
+    This library, along with any associated source code and files, is published under
+    the <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a> license, please
+    reuse.
+   </p>
+   <!-------------------------------    That's it!   --------------------------->
+  </li>
 </body>
 </html>

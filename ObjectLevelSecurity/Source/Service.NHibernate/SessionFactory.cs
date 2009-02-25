@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using NHibernate;
 using NHibernate.Cfg;
+using NHibernate.Event;
+using NHibernate.Event.Default;
 
 namespace Vestris.Service.NHibernate
 {
@@ -13,15 +15,21 @@ namespace Vestris.Service.NHibernate
     {
         private ISessionFactory _instance = null;
         private IInterceptor _interceptor = null;
+        private SessionFactoryEventListeners _eventListeners;
 
         public SessionFactory()
         {
         }
 
-        public SessionFactory(IInterceptor interceptor)
+        public SessionFactory(SessionFactoryEventListeners eventListeners)
         {
-            _interceptor = interceptor;
+            _eventListeners = eventListeners;
         }
+
+        //public SessionFactory(IInterceptor interceptor)
+        //{
+        //    _interceptor = interceptor;
+        //}
 
         public ISessionFactory Instance
         {
@@ -30,12 +38,13 @@ namespace Vestris.Service.NHibernate
                 if (_instance == null)
                 {
                     Configuration cfg = new Configuration();
-                    cfg.Properties.Add("hibernate.dialect", "NHibernate.Dialect.MsSql2000Dialect");
-                    cfg.Properties.Add("hibernate.connection.provider", "NHibernate.Connection.DriverConnectionProvider");
-                    cfg.Properties.Add("hibernate.connection.driver_class", "NHibernate.Driver.SqlClientDriver");
-                    cfg.Properties.Add("hibernate.connection.connection_string", "Server=localhost;initial catalog=OLS;Integrated Security=SSPI");
-                    if (_interceptor != null) cfg.Interceptor = _interceptor;
+                    cfg.Properties.Add("dialect", "NHibernate.Dialect.MsSql2005Dialect");
+                    cfg.Properties.Add("connection.provider", "NHibernate.Connection.DriverConnectionProvider");
+                    cfg.Properties.Add("connection.driver_class", "NHibernate.Driver.SqlClientDriver");
+                    cfg.Properties.Add("connection.connection_string", "Server=localhost;initial catalog=OLS;Integrated Security=SSPI");
                     cfg.AddAssembly("Data.NHibernate");
+                    if (_interceptor != null) cfg.Interceptor = _interceptor;
+                    if (_eventListeners != null) _eventListeners.Configure(cfg);
                     _instance = cfg.BuildSessionFactory();
                 }
                 return _instance;

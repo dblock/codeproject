@@ -20,11 +20,11 @@ namespace Vestris.Data.NHibernate.UnitTests
         {
             get
             {
-                return SessionManager.Current;
+                return SessionManager.CurrentSession;
             }
             set
             {
-                SessionManager.Current = value;
+                SessionManager.CurrentSession = value;
             }
         }
 

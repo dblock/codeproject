@@ -10,7 +10,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using Vestris.Service.NHibernate;
 using Vestris.Data.NHibernate;
-using NHibernate.Expression;
+using NHibernate.Criterion;
 
 public partial class _Default : System.Web.UI.Page
 {
@@ -26,7 +26,7 @@ public partial class _Default : System.Web.UI.Page
     {
         IdentityServiceMembershipUser user = (IdentityServiceMembershipUser)Membership.GetUser();
         // get the user's blogs
-        gridBlogs.DataSource = SessionManager.Current.CreateCriteria(typeof(Blog))
+        gridBlogs.DataSource = SessionManager.CurrentSession.CreateCriteria(typeof(Blog))
             .Add(Expression.Eq("Account", user.Account))
             .List<Blog>();
         gridBlogs.DataBind();
@@ -39,8 +39,8 @@ public partial class _Default : System.Web.UI.Page
         blog.Account = user.Account;
         blog.Created = DateTime.UtcNow;
         blog.Name = inputBlogName.Text;
-        SessionManager.Current.Save(blog);
-        SessionManager.Current.Flush();
+        SessionManager.CurrentSession.Save(blog);
+        SessionManager.CurrentSession.Flush();
         GetBlogs();
     }
 }

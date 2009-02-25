@@ -29,10 +29,10 @@ namespace Vestris.Service.Data.UnitTests
 
         public void DeleteBlog(Blog instance)
         {
-            using (new SessionManagerContextPusher(new UserContext(Session, instance.Account)))
+            using (new SessionManagerContextPusher(new UserContext(instance.Account)))
             {
-                SessionManager.CurrentSessionContext = new UserContext(Session, instance.Account);
-                Session.Delete(instance);
+                Blog instanceCopy = Session.Load<Blog>(instance.Id);
+                Session.Delete(instanceCopy);
                 Session.Flush();
             }
         }
@@ -66,10 +66,46 @@ namespace Vestris.Service.Data.UnitTests
         }
 
         [Test, ExpectedException(typeof(AccessDeniedException))]
+        public void TestCreateRetrieve()
+        {
+            // current user, also blog owner can create posts
+            BlogPost post = new BlogPost();
+            post.Account = _user;
+            post.Blog = _blog;
+            post.Title = Guid.NewGuid().ToString();
+            post.Body = Guid.NewGuid().ToString();
+            post.Created = DateTime.UtcNow;
+            Session.Save(post);
+            Session.Flush();
+
+            try
+            {
+                Account user2 = CreateUser();
+                // another user cannot read posts, he's not a blog author
+                using (new SessionManagerContextPusher(new UserContext(user2)))
+                {
+                    BlogPost postCopy = Session.Load<BlogPost>(post.Id);
+                    // if you don't resolve a field an object proxy is loaded
+                    Console.WriteLine("Post: {0}", postCopy.Body);
+                    Session.Flush();
+                }
+            }
+            catch (ADOException ex)
+            {
+                throw ex.InnerException;
+            }
+            finally
+            {
+                Session.Delete(post);
+                Session.Flush();
+            }
+        }
+
+        [Test, ExpectedException(typeof(AccessDeniedException))]
         public void TestCreateAccessDenied()
         {
             Account user2 = CreateUser();
-            using (new SessionManagerContextPusher(new UserContext(Session, user2)))
+            using (new SessionManagerContextPusher(new UserContext(user2)))
             {
                 try
                 {
@@ -83,13 +119,8 @@ namespace Vestris.Service.Data.UnitTests
                     Session.Save(post);
                     Session.Flush();
                 }
-                catch (ADOException ex)
-                {
-                    throw ex.InnerException;
-                }
                 finally
                 {
-                    Session = null;
                     DeleteUser(user2);
                 }
             }

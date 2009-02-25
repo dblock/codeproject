@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using NHibernate;
+using NHibernate.Event;
 
 namespace Vestris.Service.NHibernate
 {
@@ -14,10 +15,16 @@ namespace Vestris.Service.NHibernate
         private static ISessionStorage _sessionSource = null;
         private static SessionFactory _sessionFactory = null;
 
-        public static void Initialize(ISessionStorage storage, IInterceptor interceptor)
+        //public static void Initialize(ISessionStorage storage, IInterceptor interceptor)
+        //{
+        //    _sessionSource = storage;
+        //    _sessionFactory = new SessionFactory(interceptor);
+        //}
+
+        public static void Initialize(ISessionStorage storage, SessionFactoryEventListeners eventListeners)
         {
             _sessionSource = storage;
-            _sessionFactory = new SessionFactory(interceptor);
+            _sessionFactory = new SessionFactory(eventListeners);            
         }
 
         private static SessionFactory SessionFactory
@@ -100,19 +107,25 @@ namespace Vestris.Service.NHibernate
             SessionSource.Session = null;
         }
 
+        public static ISession Open()
+        {
+            ISession s = SessionFactory.Instance.OpenSession();
+            s.FlushMode = FlushMode.Never;
+            return s;
+        }
+
         /// <summary>
         /// Returns a current session object.
         /// </summary>
         /// <remarks>The session object will be created upon first request for it.</remarks>
-        public static ISession Current
+        public static ISession CurrentSession
         {
             get
             {
                 ISession s = SessionSource.Session;
                 if (s == null)
                 {
-                    s = SessionFactory.Instance.OpenSession();
-                    s.FlushMode = FlushMode.Never;
+                    s = Open();
                     SessionSource.Session = s;
                 }
                 return s;
