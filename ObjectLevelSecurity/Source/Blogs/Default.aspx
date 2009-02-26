@@ -43,5 +43,57 @@
    <EditRowStyle BackColor="#2461BF" />
    <AlternatingRowStyle BackColor="White" />
   </asp:GridView>
+  <h3>Other People's Blogs</h3>
+  <asp:GridView ID="gridOtherBlogs" runat="server" AutoGenerateColumns="False" 
+  CellPadding="4" ShowHeader="false">
+   <FooterStyle BackColor="#507CD1" Font-Bold="True" ForeColor="White" />
+   <RowStyle BackColor="#EFF3FB" />
+   <Columns>
+    <asp:BoundField DataField="Id" ItemStyle-HorizontalAlign="Center" />
+    <asp:TemplateField>
+     <ItemTemplate>
+      <a href="Blog.aspx?id=<%# Eval("Id") %>">
+       <%# Eval("Name") %>
+      </a>
+     </ItemTemplate>       
+    </asp:TemplateField>
+    <asp:TemplateField ItemStyle-HorizontalAlign="Center">
+     <ItemTemplate>
+      <asp:LinkButton ID="linkDelete" runat="server" CommandArgument='<%# Eval("Id") %>' Text="delete" OnCommand="linkDelete_Command" />
+     </ItemTemplate>
+    </asp:TemplateField>
+   </Columns>
+   <PagerStyle BackColor="#2461BF" ForeColor="White" HorizontalAlign="Center" />
+   <SelectedRowStyle BackColor="#D1DDF1" Font-Bold="True" ForeColor="#333333" />
+   <EditRowStyle BackColor="#2461BF" />
+   <AlternatingRowStyle BackColor="White" />
+  </asp:GridView>
+  <!--
+  <h3>Contributing Blogs</h3>
+  <asp:GridView ID="gridContributingBlogs" runat="server" AutoGenerateColumns="False" 
+  CellPadding="4" ShowHeader="false">
+   <FooterStyle BackColor="#507CD1" Font-Bold="True" ForeColor="White" />
+   <RowStyle BackColor="#EFF3FB" />
+   <Columns>
+    <asp:BoundField DataField="Id" ItemStyle-HorizontalAlign="Center" />
+    <asp:TemplateField>
+     <ItemTemplate>
+      <a href="Blog.aspx?id=<%# Eval("Id") %>">
+       <%# Eval("Name") %>
+      </a>
+     </ItemTemplate>       
+    </asp:TemplateField>
+    <asp:TemplateField ItemStyle-HorizontalAlign="Center">
+     <ItemTemplate>
+      <asp:LinkButton ID="linkDelete" runat="server" CommandArgument='<%# Eval("Id") %>' Text="delete" OnCommand="linkDelete_Command" />
+     </ItemTemplate>
+    </asp:TemplateField>
+   </Columns>
+   <PagerStyle BackColor="#2461BF" ForeColor="White" HorizontalAlign="Center" />
+   <SelectedRowStyle BackColor="#D1DDF1" Font-Bold="True" ForeColor="#333333" />
+   <EditRowStyle BackColor="#2461BF" />
+   <AlternatingRowStyle BackColor="White" />
+  </asp:GridView>
+  -->
  </p>
 </asp:Content>

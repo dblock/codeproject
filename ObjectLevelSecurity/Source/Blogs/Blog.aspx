@@ -41,8 +41,41 @@
    </asp:TemplateField>
    <asp:TemplateField ItemStyle-HorizontalAlign="Center">
     <ItemTemplate>
-     <asp:LinkButton ID="linkDelete" runat="server" CommandArgument='<%# Eval("Id") %>'
-      Text="Delete" OnCommand="linkDelete_Command" />
+     <asp:LinkButton ID="linkDeleteBlogPost" runat="server" CommandArgument='<%# Eval("Id") %>'
+      Text="Delete" OnCommand="linkDeleteBlogPost_Command" />
+    </ItemTemplate>
+   </asp:TemplateField>
+  </Columns>
+  <PagerStyle BackColor="#2461BF" ForeColor="White" HorizontalAlign="Center" />
+  <SelectedRowStyle BackColor="#D1DDF1" Font-Bold="True" ForeColor="#333333" />
+  <HeaderStyle BackColor="#507CD1" Font-Bold="True" ForeColor="White" />
+  <EditRowStyle BackColor="#2461BF" />
+  <AlternatingRowStyle BackColor="White" />
+ </asp:GridView>
+ <div class="form">
+  <p>
+   Account:
+   <asp:DropDownList ID="listAccounts" runat="server" DataValueField="Id" DataTextField="Name" />
+  </p>
+  <asp:Button CssClass="button" ID="createBlogAuthor" runat="server" OnClick="createBlogAuthor_Click"
+   Text="Add Author" />
+ </div>
+ <h3>Authors</h3>
+ <asp:GridView ID="gridBlogAuthors" runat="server" AutoGenerateColumns="False" CellPadding="4"
+  GridLines="None" ShowHeader="false">
+  <FooterStyle BackColor="#507CD1" Font-Bold="True" ForeColor="White" />
+  <RowStyle BackColor="#EFF3FB" />
+  <Columns>
+   <asp:BoundField DataField="Id" ItemStyle-HorizontalAlign="Center" />
+   <asp:TemplateField>
+    <ItemTemplate>
+     <div style="font-size: 18px; font-weight: bold;"><%# Eval("Account.Name") %></div>
+    </ItemTemplate>
+   </asp:TemplateField>
+   <asp:TemplateField ItemStyle-HorizontalAlign="Center">
+    <ItemTemplate>
+     <asp:LinkButton ID="linkDeleteBlogAuthor" runat="server" CommandArgument='<%# Eval("Id") %>'
+      Text="Delete" OnCommand="linkDeleteBlogAuthor_Command" />
     </ItemTemplate>
    </asp:TemplateField>
   </Columns>

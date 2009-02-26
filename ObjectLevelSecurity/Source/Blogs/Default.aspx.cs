@@ -39,6 +39,17 @@ public partial class _Default : System.Web.UI.Page
             .Add(Expression.Eq("Account", user.Account))
             .List<Blog>();
         gridBlogs.DataBind();
+
+        gridOtherBlogs.DataSource = SessionManager.CurrentSession.CreateCriteria(typeof(Blog))
+            .Add(Expression.Not(Expression.Eq("Account", user.Account)))
+            .List<Blog>();
+        gridOtherBlogs.DataBind();
+
+        // todo: list all contributing blogs
+        //gridContributingBlogs.DataSource = SessionManager.CurrentSession.CreateCriteria(typeof(Blog))
+        //    .Add()
+        //    .List<Blog>();
+        //gridContributingBlogs.DataBind();
     }
 
     public void createBlog_Click(object sender, EventArgs e)
