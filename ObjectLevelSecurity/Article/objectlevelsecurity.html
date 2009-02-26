@@ -1,170 +1,98 @@
-<!--------------------------------------------------------------------------->
-<!--                           INTRODUCTION                                
-
- The Code Project article submission template (HTML version)
-
-Using this template will help us post your article sooner. To use, just 
-follow the 3 easy steps below:
- 
-     1. Fill in the article description details
-     2. Add links to your images and downloads
-     3. Include the main article text
-
-That's all there is to it! All formatting will be done by our submission
-scripts and style sheets. 
-
--->
-<!--------------------------------------------------------------------------->
-<!--                        IGNORE THIS SECTION                            -->
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
- <title>The Code Project</title>
- <style>
-  BODY, P, TD
-  {
-   font-family: Verdana, Arial, Helvetica, sans-serif;
-   font-size: 10pt;
-  }
-  H2, H3, H4, H5
-  {
-   color: #ff9900;
-   font-weight: bold;
-  }
-  H2
-  {
-   font-size: 13pt;
-  }
-  H3
-  {
-   font-size: 12pt;
-  }
-  H4
-  {
-   font-size: 10pt;
-   color: black;
-  }
-  PRE
-  {
-   background-color: #FBEDBB;
-   font-family: "Courier New" , Courier, mono;
-   white-space: pre;
-  }
-  CODE
-  {
-   color: #990000;
-   font-family: "Courier New" , Courier, mono;
-  }
- </style>
- <link rel="stylesheet" type="text/css" href="http://www.codeproject.com/styles/global.css">
+ <title>Discretionary ACL Authorization Security Model in Web Applications with NHibernate
+ </title>
+ <link rel="stylesheet" type="text/css" href="/App_Themes/NetCommunity/CodeProject.css?dt=20090125" />
 </head>
-<body bgcolor="#FFFFFF" color="#000000">
- <!--------------------------------------------------------------------------->
- <!-------------------------------     STEP 1      --------------------------->
- <!--  Fill in the details (CodeProject will reformat this section for you) -->
- <pre lang="cs">Title:       ACL-based authorization model with NHibernate
-Author:      Daniel Doubrovkine
-Email:       dblock@dblock.org
-Member ID:   913212
-Language:    C#
-Platform:    Windows
-Technology:  C#, NHibernate
-Level:       Architect
-Description: A practical object-level security approach
-Section      Suggest a section...
-SubSection   Suggest a subsection...
-License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
-</pre>
- <ul class="download">
-  <li><a href="Vestris.ObjectLevelSecurity.zip">Download binaries &amp; source - 25
-   Kb</a></li>
- </ul>
- <!-------------------------------     STEP 3      --------------------------->
- <!--  Add the article text. Please use simple formatting (<h2>, <p> etc)   -->
- <h2>
-  Introduction
- </h2>
- <p>
-  This article introduces a practical and secure model for data access with NHibernate.
-  Specifically, we will produce a discretionary access model intercepted by an NHibernate
-  2.0 event system. We will examine both usage of interceptors and events. While rather
-  straightforward, this is a very powerful model that provides a robust and secure
-  Data Access Layer (DAL) and a per-class/instance approach with a minimal amount
-  of code.</p>
- <h2>
-  Background
- </h2>
- <p>
-  In a typical web or SOA architecture a caller is first authenticated and a security
-  context is created based on the user's credentials. This context is made available
-  through the duration of the request or session. Many web services will then verify
-  whether this user is allowed to perform a specific action behind the web service
-  API.</p>
- <p>
-  For example, in a blogging system we would implement a method called <code>SaveBlogPost</code>
-  and check whether the calling user is an authorized author and throw an exception
-  when otherwise. A different call, <code>GetBlogPost</code> would check for read
-  permissions and <code>GetAllBlogPosts</code> would have to iterate through the resulting
-  list and check access. This is, in my opinion, a very cumbersome implementation.</p>
- <p>
-  In contrast to a web service a file system works with ACLs. An Access Control List
-  (ACL) is a list of permissions attached to an object. In an ACL-based security model,
-  when a subject requests to perform an operation on an object, the operating system
-  first checks the list for an applicable entry in order to decide whether to proceed
-  with the operation. Whether a file is accessed locally, via the network, a web service
-  or COM, the ACL system is responsible for the file's security.</p>
- <p>
-  How can we implement a similar ACL-based file system model in a web site or service?</p>
- <h2>
-  Implementation
- </h2>
- <h3>
-  Object Model
- </h3>
- <p>
-  We will be implementing an ACL-based model with NHibernate 2.0. I have picked the
-  following simple database object model for a blogging system.</p>
- <ul>
-  <li>An <code>Account</code> that represents an authenticated user. In our system
-   anyone can sign up, ie. create an account.</li>
-  <li>A <code>Blog </code>has an account owner and a variable list of authors. In our
-   system any authenticated user can create a blog.</li>
-  <li>A <code>BlogAuthor</code> that represents an individual contributor or Account.
-   In our system the blog owner can add or remove contributors. Contributors can opt
-   out of being contributors without further verification.</li>
-  <li>A <code>BlogPost</code> can be seen by everyone. The blog owner can edit all
-   posts and blog authors can edit their own posts only.</li>
- </ul>
- <p>
-  <img src="domainmodel.jpg" />&nbsp;</p>
- <p>
-  We want to design a programming model where we can represent the above authorization
-  requirements in C# code in a direct, short and concise manner. We would like to
-  write &quot;everyone can create this object&quot; or &quot;a blog author can delete
-  his own posts&quot; in one line of C#. When we succeed, the one line of C# code
-  can be easily extended to a configuration-based implementation where permissions
-  are described in XML files.</p>
- <h3>
-  NHibernate Data Layer
- </h3>
- <p>
-  Getting the data in and out of the database is a trivial problem solved by many
-  frameworks. I have chosen <a href="http://www.puzzleframework.com">Puzzle Framework</a>
-  to design the domain model, export C# classes for NHibernate (both the .cs class
-  implementations and the .hbm.xml NHibernate mappings) and make the UML diagram above.
-  I've also added a generic <code>NHibernateCrudTest</code> unit test that ensures
-  that all CRUD operations (create, retrieve, update and delete) can be made. This
-  is the DAL, without any access control.</p>
- <p>
-  Here's an example of a <code>Blog</code> class. Notice that I have modified the
-  Account property to disallow any update, otherwise this is Puzzle-generated code.
-  This is a way of disallowing ownership change for a blog by design.</p>
- <pre lang="cs">public class Blog: IDataObject
+<base href="http://www.codeproject.com/KB/web-security/" />
+<body>
+ <div>
+  <span id="ArticleContent">
+   <ul class="download">
+    <li><a href="objectlevelsecurity/Vestris.ObjectLevelSecurity.zip">Download source
+     code - 70.2 KB</a></li>
+   </ul>
+   <h2>
+    Introduction</h2>
+   <p>
+    This article introduces a practical and secure model for data access in web applications
+    with NHibernate. Specifically, we will produce a discretionary access model intercepted
+    by an NHibernate 2.0 event system. We will examine the usage of both interceptors
+    and events. While rather straightforward, this is a very powerful architecture that
+    provides a robust and secure Data Access Layer (DAL) and a per-class/instance approach
+    with a minimal amount of code.</p>
+   <h2>
+    Background</h2>
+   <p>
+    In a typical web or SOA architecture, a caller is first authenticated, and a security
+    context is created based on the user's credentials. This context is made available
+    through the duration of the request or session. Many Web Services will then verify
+    whether this user is allowed to perform a specific action behind the Web Service
+    API.</p>
+   <p>
+    For example, in a blogging system, we would implement a method called <code>SaveBlogPost</code>
+    and check whether the calling user is an authorized author, and throw an exception
+    when otherwise. A different call, <code>GetBlogPost</code>, would check for read
+    permissions, and <code>GetAllBlogPosts</code> would have to iterate through the
+    resulting list and check access. This is, in my opinion, a very cumbersome implementation.</p>
+   <p>
+    In contrast to a web service or web application, a file system works with ACLs.
+    An Access Control List (ACL) is a list of permissions attached to an object. In
+    an ACL-based security model, when a subject requests to perform an operation on
+    an object, the Operating System first checks the list for an applicable entry in
+    order to decide whether to proceed with the operation. Whether a file is accessed
+    locally, via the network, a Web Service, or COM, the ACL system is responsible for
+    the file's security.</p>
+   <p>
+    How can we implement a similar ACL-based file system model for a web application?</p>
+   <h2>
+    Implementation</h2>
+   <h3>
+    Object Model</h3>
+   <p>
+    We will be implementing an ACL-based model with NHibernate 2.0. I have picked the
+    following simple database object model for a blogging system:</p>
+   <ul>
+    <li>An <code>Account</code> that represents an authenticated user. In our system,
+     anyone can sign up, i.e., create an account.</li>
+    <li>A <code>Blog</code> has an account owner and a variable list of authors. In our
+     system, any authenticated user can create a blog.</li>
+    <li>A <code>BlogAuthor</code> that represents an individual contributor or account.
+     In our system, the blog owner can add or remove contributors. Contributors can opt
+     out of being contributors without further verification.</li>
+    <li>A <code>BlogPost</code> can be seen by everyone. The blog owner can edit all
+     posts, and blog authors can edit their own posts only.</li>
+   </ul>
+   <p>
+    <img height="386" src="objectlevelsecurity/domainmodel.jpg" width="434" /></p>
+   <p>
+    We want to design a programming model where we can represent the above authorization
+    requirements in C# code in a direct, short, and concise manner. We would like to
+    write &quot;everyone can create this object&quot; or &quot;a blog author can delete
+    his own posts&quot; in one line of C#. When we succeed, the one line of C# code
+    can be easily extended to a configuration-based implementation where permissions
+    are described in XML files.</p>
+   <h3>
+    NHibernate Data Layer
+   </h3>
+   <p>
+    Getting the data in and out of the database is a trivial problem solved by many
+    frameworks. I have chosen <a href="http://www.puzzleframework.com/" target="_blank">
+     Puzzle Framework</a> to design the domain model, export C# classes for NHibernate
+    (both the <em>.cs</em> class implementations and the <em>.hbm.xml</em> NHibernate
+    mappings), and make the UML diagram above. I've also added a generic <code>NHibernateCrudTest</code>
+    Unit Test that ensures that all CRUD operations (Create, Retrieve, Update, and Delete)
+    can be made. This is the DAL, without any access control.</p>
+   <p>
+    Here's an example of a <code>Blog</code> class. Notice that I have modified the
+    <code>Account</code> property to disallow any update; otherwise, this is Puzzle-generated
+    code. This is a way of disallowing ownership change for a blog, by design.</p>
+   <pre lang="cs">public class Blog: IDataObject
 {
     private System.Int32 _Id;
     private Account _Account;
-    private System.Collections.Generic.IList
-<blogauthor> _BlogAuthors;
-    private System.Collections.Generic.IList<BlogPost> _BlogPosts;
+    private System.Collections.Generic.IList&lt;blogauthor&gt; _BlogAuthors;
+    private System.Collections.Generic.IList&lt;blogpost&gt; _BlogPosts;
     private System.DateTime _Created;
     private System.String _Description;
     private System.String _Name;
@@ -185,13 +113,13 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
         }
     }
 
-    public virtual System.Collections.Generic.IList<BlogAuthor> BlogAuthors
+    public virtual System.Collections.Generic.IList&lt;blogauthor&gt; BlogAuthors
     {
         get { return _BlogAuthors; }
         set { _BlogAuthors = value; }
     }
 
-    public virtual System.Collections.Generic.IList<BlogPost> BlogPosts
+    public virtual System.Collections.Generic.IList&lt;blogpost&gt; BlogPosts
     {
         get { return _BlogPosts; }
         set { _BlogPosts = value; }
@@ -214,99 +142,106 @@ License:     <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a>
         get { return _Name; }
         set { _Name = value; }
     }
-}
-  </pre>
- The following NHibernate mapping is auto-generated for a <code>Blog</code> class.
- <pre lang="xml">&lt;?xml version="1.0" encoding="utf-8" ?&gt;
-&lt;hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" schema="dbo"&gt;
-  &lt;class name="Vestris.Data.NHibernate.Blog, Data.NHibernate" table="Blog"&gt;
-    &lt;id name="Id" type="Int32" column="Blog_Id" access="field.pascalcase-underscore"&gt;
-      &lt;generator class="identity" /&gt;
+}</pre>
+   <p>
+    The following NHibernate mapping is auto-generated for a <code>Blog</code> class:</p>
+   <pre lang="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+&lt;hibernate-mapping xmlns=&quot;urn:nhibernate-mapping-2.2&quot; schema=&quot;dbo&quot;&gt;
+  &lt;class name=&quot;Vestris.Data.NHibernate.Blog, Data.NHibernate&quot; table=&quot;Blog&quot;&gt;
+    &lt;id name=&quot;Id&quot; type=&quot;Int32&quot; 
+           column=&quot;Blog_Id&quot; access=&quot;field.pascalcase-underscore&quot;&gt;
+      &lt;generator class=&quot;identity&quot; /&gt;
     &lt;/id&gt;
-    &lt;many-to-one name="Account" column="Account_Id" class="Vestris.Data.NHibernate.Account, Data.NHibernate" /&gt;
-    &lt;bag name="BlogAuthors" inverse="true"&gt;
-      &lt;key column="Blog_Id" /&gt;
-      &lt;one-to-many class="Vestris.Data.NHibernate.BlogAuthor, Data.NHibernate" /&gt;
+    &lt;many-to-one name=&quot;Account&quot; column=&quot;Account_Id&quot; 
+          class=&quot;Vestris.Data.NHibernate.Account, Data.NHibernate&quot; /&gt;
+    &lt;bag name=&quot;BlogAuthors&quot; inverse=&quot;true&quot;&gt;
+      &lt;key column=&quot;Blog_Id&quot; /&gt;
+      &lt;one-to-many class=&quot;Vestris.Data.NHibernate.BlogAuthor, Data.NHibernate&quot; /&gt;
     &lt;/bag&gt;
-    &lt;bag name="BlogPosts" inverse="true"&gt;
-      &lt;key column="Blog_Id" /&gt;
-      &lt;one-to-many class="Vestris.Data.NHibernate.BlogPost, Data.NHibernate" /&gt;
+    &lt;bag name=&quot;BlogPosts&quot; inverse=&quot;true&quot;&gt;
+      &lt;key column=&quot;Blog_Id&quot; /&gt;
+      &lt;one-to-many class=&quot;Vestris.Data.NHibernate.BlogPost, Data.NHibernate&quot; /&gt;
     &lt;/bag&gt;
-    &lt;property name="Created" column="Created" type="DateTime" /&gt;
-    &lt;property name="Description" column="Description" type="String" /&gt;
-    &lt;property name="Name" column="Name" type="String" /&gt;
+    &lt;property name=&quot;Created&quot; column=&quot;Created&quot; type=&quot;DateTime&quot; /&gt;
+    &lt;property name=&quot;Description&quot; column=&quot;Description&quot; type=&quot;String&quot; /&gt;
+    &lt;property name=&quot;Name&quot; column=&quot;Name&quot; type=&quot;String&quot; /&gt;
   &lt;/class&gt;
-&lt;/hibernate-mapping&gt;
-  </pre>
- <h3>
-  NHibernate Interceptor
- </h3>
- <p>
-  Since our goal is to do authorization at the lowest level possible and at object
-  level we must intercept access to all objects above or below the DAL. An obvious
-  choice is to wrap every class in the DAL with a class that implements authentication,
-  but NHibernate offers a much more compelling model by using a class that implements
-  <code>IInterceptor</code>. The <code>IInterceptor</code> interface defines a virtual
-  hook into the CRUD functions. An empty implementation, <code>NHibernate.EmptyInterceptor</code>,
-  is also available and can be derived from in order to implement some, rather than
-  all methods. For example, we can now witness the lifetime of all objects on the
-  console.</p>
- <pre lang="cs">public class ServiceDataInterceptor : EmptyInterceptor
+&lt;/hibernate-mapping&gt;</pre>
+   <h3>
+    NHibernate Interceptor
+   </h3>
+   <p>
+    Since our goal is to do authorization at the lowest level possible and at object
+    level, we must intercept access to all objects above or below the DAL. An obvious
+    choice is to wrap every class in the DAL with a class that implements authentication,
+    but NHibernate offers a much more compelling model by using a class that implements
+    <code>IInterceptor</code>. The <code>IInterceptor</code> interface defines a virtual
+    hook into the CRUD functions. An empty implementation, <code>NHibernate.EmptyInterceptor</code>,
+    is also available, and can be derived from in order to implement some, rather than
+    all methods. For example, we can now witness the lifetime of all objects on the
+    console.</p>
+   <pre lang="cs">public class ServiceDataInterceptor : EmptyInterceptor
 {
     // save an existing instance (flush dirty data)
-    public override bool OnFlushDirty(object entity, object id, object[] currentState, 
-        object[] previousState, string[] propertyNames, NHibernate.Type.IType[] types)
+    public override bool OnFlushDirty(object entity, object id, 
+           object[] currentState, object[] previousState, 
+           string[] propertyNames, NHibernate.Type.IType[] types)
     {
-        Console.WriteLine("FlushDirty: {0}:{1}", entity, id);
-        return base.OnFlushDirty(entity, id, currentState, previousState, propertyNames, types);
+        Console.WriteLine(&quot;FlushDirty: {0}:{1}&quot;, entity, id);
+        return base.OnFlushDirty(entity, id, currentState, 
+               previousState, propertyNames, types);
     }
 
     // save a new instance
-    public override bool OnSave(object entity, object id, object[] state, string[] propertyNames, 
+    public override bool OnSave(object entity, object id, 
+                         object[] state, string[] propertyNames, 
         NHibernate.Type.IType[] types)
     {
-        Console.WriteLine("Save: {0}:{1}", entity, id);
+        Console.WriteLine(&quot;Save: {0}:{1}&quot;, entity, id);
         return base.OnSave(entity, id, state, propertyNames, types);
     }
 
     // load an existing instance
-    public override bool OnLoad(object entity, object id, object[] state, string[] propertyNames, 
+    public override bool OnLoad(object entity, object id, 
+                    object[] state, string[] propertyNames, 
         NHibernate.Type.IType[] types)
     {
-        Console.WriteLine("Load: {0}:{1}", entity, id);
+        Console.WriteLine(&quot;Load: {0}:{1}&quot;, entity, id);
         return base.OnLoad(entity, id, state, propertyNames, types);
     }
 
     // delete an existing instance
-    public override void OnDelete(object entity, object id, object[] state, string[] propertyNames, 
+    public override void OnDelete(object entity, object id, 
+                    object[] state, string[] propertyNames, 
         NHibernate.Type.IType[] types)
     {
-        Console.WriteLine("Delete: {0}:{1}", entity, id);
+        Console.WriteLine(&quot;Delete: {0}:{1}&quot;, entity, id);
         base.OnDelete(entity, id, state, propertyNames, types);
     }
-}    
-   </pre>
- An interceptor is hooked-up to a session factory when the latter is manufactured.
- <pre lang="cs">public ISessionFactory GetSessionFactory()
+}</pre>
+   <p>
+    An interceptor is hooked-up to a session factory when the latter is manufactured.</p>
+   <pre lang="cs">public ISessionFactory GetSessionFactory()
 {
     Configuration cfg = new Configuration();
-    cfg.Properties.Add("dialect", "NHibernate.Dialect.MsSql2000Dialect");
-    cfg.Properties.Add("connection.provider", "NHibernate.Connection.DriverConnectionProvider");
-    cfg.Properties.Add("connection.driver_class", "NHibernate.Driver.SqlClientDriver");
-    cfg.Properties.Add("connection.connection_string", "...");
+    cfg.Properties.Add(&quot;dialect&quot;, &quot;NHibernate.Dialect.MsSql2000Dialect&quot;);
+    cfg.Properties.Add(&quot;connection.provider&quot;, 
+                       &quot;NHibernate.Connection.DriverConnectionProvider&quot;);
+    cfg.Properties.Add(&quot;connection.driver_class&quot;, 
+                       &quot;NHibernate.Driver.SqlClientDriver&quot;);
+    cfg.Properties.Add(&quot;connection.connection_string&quot;, &quot;...&quot;);
     cfg.Interceptor = new ServiceDataInterceptor();
-    cfg.AddAssembly("...");
+    cfg.AddAssembly(&quot;...&quot;);
     return cfg.BuildSessionFactory();
 }}</pre>
- <h3>
-  NHibernate Events</h3>
- <p>
-  Another way of hooking up to the NHibernate pipeline is with event listeners. This
-  is a more detailed framework than an interceptor since almost every <code>ISession</code>
-  method has a corresponding event. It is possible to configure a session factory
-  with a number of listeners at runtime. This is a new feature in NHibernate 2.0.</p>
- <pre lang="cs">
-private T[] Insert&lt;T&gt;(T[] listeners, T instance)
+   <h3>
+    NHibernate Events</h3>
+   <p>
+    Another way of hooking up to the NHibernate pipeline is with event listeners. This
+    is a more detailed framework than an interceptor since almost every <code>ISession</code>
+    method has a corresponding event. It is possible to configure a session factory
+    with a number of listeners at runtime. This is a new feature in NHibernate 2.0.</p>
+   <pre lang="cs">private T[] Insert&lt;T&gt;(T[] listeners, T instance)
 {
     if (instance == null)
         return listeners;
@@ -319,33 +254,33 @@ private T[] Insert&lt;T&gt;(T[] listeners, T instance)
 
 ...
 
-cfg.EventListeners.PostLoadEventListeners = Insert(cfg.EventListeners.PostLoadEventListeners, 
-    new MyPostLoadEventListener());</pre>
- <p>
-  It's also the only way to access an object after it has been loaded as opposed to
-  an interceptor that seeks to capture properties before an instance is modified in
-  any way. As you will see below with ACLs, this limitation of interceptors makes
-  it useless for our purposes, we will hence use the event system.
- </p>
- <h3>
-  User Identity
- </h3>
- <p>
-  Before we implement any actual authorization we must answer two basic questions.</p>
- <ul>
-  <li>What defines a user?</li>
-  <li>How can we create and carry a security context throughout a session?</li>
- </ul>
- <p>
-  In our implementation a user needs to be created first, adding a row to the <code>
-   Account</code> table. I chose to implement an <code>IdentityService</code> that
-  can log-in a user by looking up this record. This service could be easily replaced
-  with another authentication scheme that, for example, logs in a user to Active Directory,
-  then locates a record in the <code>Account</code> table based on the SID. For demonstration
-  purposes both the security context and the identity service are rudimentary, in
-  the "real world" this should be a robust interface-based and pluggable provider
-  implementation.</p>
- <pre lang="cs">public class UserContext : EmptySessionContext
+cfg.EventListeners.PostLoadEventListeners = 
+   Insert(cfg.EventListeners.PostLoadEventListeners, 
+          new MyPostLoadEventListener());</pre>
+   <p>
+    It's also the only way to access an object after it has been loaded, as opposed
+    to an interceptor that seeks to capture properties before an instance is modified
+    in any way. As you will see below with ACLs, this limitation of interceptors makes
+    it useless for our purposes, we will hence use the event system.</p>
+   <h3>
+    User Identity
+   </h3>
+   <p>
+    Before we implement any actual authorization, we must answer two basic questions.</p>
+   <ul>
+    <li>What defines a user?</li>
+    <li>How can we create and carry a security context throughout a session?</li>
+   </ul>
+   <p>
+    In our implementation, a user needs to be created first, adding a row to the <em>
+     Account</em> table. I chose to implement an <code>IdentityService</code> that can
+    log-in a user by looking up this record. This service could be easily replaced with
+    another authentication scheme that, for example, logs in a user to Active Directory,
+    then locates a record in the <em>Account</em> table based on the SID. For demonstration
+    purposes, both the security context and the identity service are rudimentary; in
+    the &quot;real world&quot;, this should be a robust, interface-based, and pluggable
+    provider implementation.</p>
+   <pre lang="cs">public class UserContext : EmptySessionContext
 {
     private int _accountId = 0;
     private DateTime _timestamp = DateTime.UtcNow;
@@ -357,8 +292,8 @@ cfg.EventListeners.PostLoadEventListeners = Insert(cfg.EventListeners.PostLoadEv
         _accountId = account.Id;
     }
 }
-  </pre>
- <pre lang="cs">public class IdentityService
+  
+public class IdentityService
 {
     private ISession _session = null;
 
@@ -370,8 +305,8 @@ cfg.EventListeners.PostLoadEventListeners = Insert(cfg.EventListeners.PostLoadEv
     public UserContext Login(string username, string password)
     {
         Account account = _session.CreateCriteria(typeof(Account))
-            .Add(Expression.Eq("Name", username))
-            .Add(Expression.Eq("Password", password))
+            .Add(Expression.Eq(&quot;Name&quot;, username))
+            .Add(Expression.Eq(&quot;Password&quot;, password))
             .UniqueResult&lt;Account&gt;();
 
         if (account == null)
@@ -381,13 +316,12 @@ cfg.EventListeners.PostLoadEventListeners = Insert(cfg.EventListeners.PostLoadEv
 
         return new UserContext(account);
     }
-}
-  </pre>
- <p>
-  The manufactured security context must now be made available through the lifetime
-  of a request. The web services model typically exposes a singleton SessionManager.
-  We will need a similar foundation for non-web-based unit tests, possibly thread-safe.</p>
- <pre lang="cs">public abstract class SessionManager
+}</pre>
+   <p>
+    The manufactured security context must now be made available through the lifetime
+    of a request. The Web Services model typically exposes a singleton, <code>SessionManager</code>.
+    We will need a similar foundation for non-web-based Unit Tests, possibly thread-safe.</p>
+   <pre lang="cs">public abstract class SessionManager
 {
     [ThreadStatic]
     private static ISession _currentSession = null;
@@ -406,36 +340,33 @@ cfg.EventListeners.PostLoadEventListeners = Insert(cfg.EventListeners.PostLoadEv
         get { return _currentSessionContext; }
         set { _currentSessionContext = value; }
     }
-}
-  </pre>
- <p>
-  The actual code attached to the article&#39;s source makes some more complex production
-  grade improvements. First, a session source is provided that can be HTTP, thread-
-  or user-context based depending on the execution context. This enables a seamless
-  integration in various threading or pipeline requirements based on <a href="http://wiki.nhibernate.org/display/NH/Using+NHibernate+with+ASP.Net">
-   this idea</a>. Unit tests use the user-context-based session source and an impersonator
-  that allows the current thread to switch to a different user context, then revert
-  back to self.</p>
- <p>
-  In the web-based scenario the ASP.NET pipeline will initialize the session manager
-  with the HTTP pipeline context and a set of event handlers. Subsequently, it will
-  manufacture the logged-in user context and any future code, including the event
-  handlers performing the data authorization tasks, can obtain <code>SessionManager.CurrentSessionContext</code>
-  to work with. The following code initializes SessionManager under ASP.NET and sets
-  the default user context.</p>
- <pre lang="cs">
-SessionManager.Initialize(new HttpSessionSource(), ServiceDataEventListeners.Instance); 
+}</pre>
+   <p>
+    The actual code attached to the article's source makes some more complex production
+    grade improvements. First, a session source is provided that can be HTTP, thread-
+    or user-context based depending on the execution context. This enables a seamless
+    integration in various threading or pipeline requirements based on <a href="http://wiki.nhibernate.org/display/NH/Using+NHibernate+with+ASP.Net"
+     target="_blank">this idea</a>. Unit Tests use the user-context-based session source,
+    and an impersonator that allows the current thread to switch to a different user
+    context, then revert back to self.</p>
+   <p>
+    In the web-based scenario, the ASP.NET pipeline will initialize the session manager
+    with the HTTP pipeline context and a set of event handlers. Subsequently, it will
+    manufacture the logged-in user context; and any future code, including the event
+    handlers performing the data authorization tasks, can obtain <code>SessionManager.CurrentSessionContext</code>
+    to work with. The following code initializes <code>SessionManager</code> under ASP.NET,
+    and sets the default user context:</p>
+   <pre lang="cs">SessionManager.Initialize(new HttpSessionSource(), ServiceDataEventListeners.Instance); 
 SessionManager.CurrentSessionContext = new GuestUserContext();</pre>
- <h3>
-  Access Control Lists</h3>
-<p>
-   An Access Control List (ACL) is a list of permissions attached to an object. Each
-   entry defines a <code>DataOperationPermission</code> (a type of data access allowed
-   or denied) for a type of <code>DataOperation</code>. An ACL can then render a verdict
-   on whether the calling user may or may not access the object to which the ACL is
-   attached to.
-  </p>
-  <pre lang="cs">public enum DataOperation
+   <h3>
+    Access Control Lists</h3>
+   <p>
+    An Access Control List (ACL) is a list of permissions attached to an object. Each
+    entry defines a <code>DataOperationPermission</code> (a type of data access allowed
+    or denied) for a type of <code>DataOperation</code>. An ACL can then render a verdict
+    on whether the calling user may or may not access the object to which the ACL is
+    attached to.</p>
+   <pre lang="cs">public enum DataOperation
 {
     None = 0,
     Create = 1,
@@ -464,23 +395,20 @@ public enum ACLVerdict
 public interface IACLEntry
 {
     ACLVerdict Apply(UserContext ctx, DataOperation op);
-}
-   </pre>
-  <p>
-   Does it seem that this should be a boolean <code>Allowed</code> or <code>Denied</code>
-   verdict? Consider an ACL entry that says that an <code>Account</code> has read access
-   to a <code>Blog</code>. This says nothing about whether another account has access
-   to the same blog, producing a <code>None</code> verdict. In a system that denies
-   access by default (an ACL must allow access explicitly), a <code>None</code> verdict
-   over all entries in an ACL means that access is denied.
-  </p>
-  <p>
-   With a base <code>ACLBaseEntry</code>, we can specialize a number of ACL entries,
-   including <code>ACLEveryoneAllowRetrieve</code>, <code>ACLEveryoneAllowCreate</code>,
-   as well as a generic <code>ACLAccount</code> that assignes a specific permission
-   to a specific account. Here's an example of <code>ACLEveryoneAllowRetrieve</code>.
-  </p>
-  <pre lang="cs">public class ACLEveryoneAllowRetrieve : ACLBaseEntry
+}</pre>
+   <p>
+    Does it seem that this should be a boolean <code>Allowed</code> or <code>Denied</code>
+    verdict? Consider an ACL entry that says that an <code>Account</code> has read access
+    to a <code>Blog</code>. This says nothing about whether another account has access
+    to the same blog, producing a <code>None</code> verdict. In a system that denies
+    access by default (an ACL must allow access explicitly), a <code>None</code> verdict
+    over all entries in an ACL means that access is denied.</p>
+   <p>
+    With a base <code>ACLBaseEntry</code>, we can specialize a number of ACL entries,
+    including <code>ACLEveryoneAllowRetrieve</code>, <code>ACLEveryoneAllowCreate</code>,
+    as well as a generic <code>ACLAccount</code> that assigns a specific permission
+    to a specific account. Here's an example of <code>ACLEveryoneAllowRetrieve</code>:</p>
+   <pre lang="cs">public class ACLEveryoneAllowRetrieve : ACLBaseEntry
 {
     public ACLEveryoneAllowRetrieve()
         : base(DataOperation.Retreive, DataOperationPermission.Allow)
@@ -492,15 +420,13 @@ public interface IACLEntry
     {
         return (op == DataOperation.Retreive) ? ACLVerdict.Allowed : ACLVerdict.None;
     }
-}
-  </pre>
-  <p>
-   In general, an <code>ACL</code> is a collection of <code>ACLEntry</code> items and
-   implements such methods as <code>Check</code>. The latter will throw an <code>AccessDeniedException</code>
-   when the current security context <code>ctx</code> doesn't allow the caller to perform
-   an action <code>op</code>.
-  </p>
-  <pre lang="cs">public ACLVerdict Apply(UserContext ctx, DataOperation op)
+}</pre>
+   <p>
+    In general, an ACL is a collection of <code>ACLEntry</code> items, and implements
+    such methods as <code>Check</code>. The latter will throw an <code>AccessDeniedException</code>
+    when the current security context <code>ctx</code> doesn't allow the caller to perform
+    an action <code>op</code>.</p>
+   <pre lang="cs">public ACLVerdict Apply(UserContext ctx, DataOperation op)
 {
     ACLVerdict current = ACLVerdict.Denied;
 
@@ -539,56 +465,51 @@ public void Check(UserContext ctx, DataOperation op)
     {
         throw new AccessDeniedException();
     }
-}
-   </pre>
-  <h3>
-   Applying ACLs to Objects</h3>
-  <p>
-   An ACL applies to an instance of an object. For example, given a <code>Blog</code>
-   we need a <code>BlogACL</code> that inherits from <code>ACL</code>. I chose a simple
-   construct of manufacturing an instance of an ACL from an instance of an NHibernate
-   data class via reflection, by name. Alternatively an ACL could be attached to the
-   DAL class itself, but I prefer some level of aspect programming.</p>
-  <pre lang="cs">
-public abstract class ServiceDataAuthorizationConnector
+}</pre>
+   <h3>
+    Applying ACLs to Objects</h3>
+   <p>
+    An ACL applies to an instance of an object. For example, given a <code>Blog</code>,
+    we need a <code>BlogACL</code> that inherits from <code>ACL</code>. I chose a simple
+    construct of manufacturing an instance of an ACL from an instance of an NHibernate
+    data class via Reflection, by name. Alternatively, an ACL could be attached to the
+    DAL class itself, but I prefer some level of aspect programming.</p>
+   <pre lang="cs">public abstract class ServiceDataAuthorizationConnector
 {
     public static void Check(IDataObject instance, DataOperation op)
     {
-        string aclClassTypeName = string.Format("Vestris.Service.Data.{0}ClassACL", instance.GetType().Name);            
-        Type aclClassType = Assembly.GetExecutingAssembly().GetType(aclClassTypeName, true, false);
+        string aclClassTypeName = string.Format(&quot;Vestris.Service.&quot; + 
+                                  &quot;Data.{0}ClassACL&quot;, instance.GetType().Name);            
+        Type aclClassType = Assembly.GetExecutingAssembly().GetType(
+                                     aclClassTypeName, true, false);
         object[] args = { instance };
         ACL acl = (ACL) Activator.CreateInstance(aclClassType, args);
         acl.Check(CurrentUserContext, op);
     }
-}
-   </pre>
-  <p>
-   The following method is implemented in the post-load event listener and will check
-   access when loading any instance of <code>IDataObject</code> by manufacturing a
-   <code>BlogClassACL</code> for an instance of a <code>Blog</code>. By using reflection
-   I have separated authorization classes from NHibernate data, but it might be a good
-   idea to implement ACL members in the auto-generated DAL and add ACL methods to the
-   <code>IDataObject</code> interface.
-  </p>
-  <pre lang="cs">
-public class ServiceDataPostLoadEventListener : IPostLoadEventListener
+}</pre>
+   <p>
+    The following method is implemented in the post-load event listener, and will check
+    access when loading any instance of <code>IDataObject</code>, by manufacturing a
+    <code>BlogClassACL</code> for an instance of a <code>Blog</code>. By using Reflection,
+    I have separated authorization classes from NHibernate data, but it might be a good
+    idea to implement ACL members in the auto-generated DAL and add ACL methods to the
+    <code>IDataObject</code> interface.</p>
+   <pre lang="cs">public class ServiceDataPostLoadEventListener : IPostLoadEventListener
 {
     public void OnPostLoad(PostLoadEvent @event)
     {
-        Debug.WriteLine(string.Format("OnPostLoad - {0}", @event.Entity));
+        Debug.WriteLine(string.Format(&quot;OnPostLoad - {0}&quot;, @event.Entity));
         if (@event.Entity is IDataObject)
         {
             ServiceDataAuthorizationConnector.Check((IDataObject) @event.Entity, 
                 DataOperation.Retreive);
         }
     }
-}
-</pre>
-  <p>
-   The implementation of <code>BlogClassACL</code> is meant to be trivial since we
-   will have to develop a ClassACL for each data type.
-  </p>
-  <pre lang="cs">public class BlogClassACL : ACL
+}</pre>
+   <p>
+    The implementation of <code>BlogClassACL</code> is meant to be trivial since we
+    will have to develop a <code>ClassACL</code> for each data type.</p>
+   <pre lang="cs">public class BlogClassACL : ACL
 {
     public BlogClassACL(Blog instance)
     {
@@ -599,17 +520,15 @@ public class ServiceDataPostLoadEventListener : IPostLoadEventListener
         // the owner has full privileges
         this.Add(new ACLAccount(instance.Account, DataOperation.All));
     }
-}
-   </pre>
-  <p>
-   The above code is what we&#39;re trying to achieve! It shows immediate advantages
-   and the power of this approach: the implementor has access to the actual object
-   and can derive an ACL from it. It is very readable and describes naturally who has
-   access to an instance of a <code>Blog</code> in exchange of a small performance
-   penalty. In addition, it is possible to "inherit" ACLs as in the following example
-   of a <code>BlogPostClassACL</code>.
-  </p>
-  <pre lang="cs">public class BlogPostClassACL : ACL
+}</pre>
+   <p>
+    The above code is what we're trying to achieve! It shows immediate advantages, and
+    the power of this approach: the implementor has access to the actual object, and
+    can derive an ACL from it. It is very readable, and describes naturally who has
+    access to an instance of a <code>Blog</code>, in exchange of a small performance
+    penalty. In addition, it is possible to &quot;inherit&quot; ACLs as in the following
+    example of a <code>BlogPostClassACL</code>:</p>
+   <pre lang="cs">public class BlogPostClassACL : ACL
 {
     public BlogPostClassACL(BlogPost instance)
     {
@@ -626,89 +545,92 @@ public class ServiceDataPostLoadEventListener : IPostLoadEventListener
             }
         }
     }
-}    
-   </pre>
-  <p>
-   You must be careful with inehritance. The above code is actually wrong. The blog&#39;s
-   ACL allows any authenticated user to create a blog. Inheriting the ACL means that
-   any user can create a post, which is incorrect - only blog owner or blog authors
-   can create posts.</p>
-  <h2>
-   ASP.NET</h2>
-  <h3>
-   Membership Provider</h3>
-  <p>
-   ASP.NET offers a simple and powerful membership provider model for authentication
-   that we will use by the book. Our <code>IdentityServiceMembershipProvider</code>
-   serves instances of <code>IdentityServiceMembershipUser</code> objects. Here're
-   the interesting parts.
-  </p>
-  <pre lang="cs">
-public class IdentityServiceMembershipUser : MembershipUser
+}</pre>
+   <p>
+    You must be careful with inheritance. The above code is actually wrong. The blog's
+    ACL allows any authenticated user to create a blog. Inheriting the ACL means that
+    any user can create a post, which is incorrect - only the blog owner or blog authors
+    can create posts.</p>
+   <h2>
+    ASP.NET</h2>
+   <h3>
+    Membership Provider</h3>
+   <p>
+    ASP.NET offers a simple and powerful Membership Provider model for authentication
+    that we will use by the book. Our <code>IdentityServiceMembershipProvider</code>
+    serves instances of <code>IdentityServiceMembershipUser</code> objects. Here're
+    the interesting parts:</p>
+   <pre lang="cs">public class IdentityServiceMembershipUser : MembershipUser
 {
     public IdentityServiceMembershipUser(Account account) { }
     public override DateTime CreationDate { get { ...; } }
     public override string UserName { get { ...; } }
 }
-   </pre>
-  <pre lang="cs">
+   
 public class IdentityServiceMembershipProvider : MembershipProvider
 {
     private SessionFactory _sessionFactory = new SessionFactory(null);
     
     public override bool ValidateUser(string username, string password)
     {
-        IdentityService identityService = new IdentityService(_sessionFactory.Instance.OpenSession());
+        IdentityService identityService = 
+          new IdentityService(_sessionFactory.Instance.OpenSession());
         return identityService.TryLogin(username, password);
     }
 
-    public override MembershipUser CreateUser(string username, string password, string email, 
-        string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, 
-        out MembershipCreateStatus status)
+    public override MembershipUser CreateUser(string username, string password, 
+           string email, string passwordQuestion, string passwordAnswer, 
+           bool isApproved, object providerUserKey, 
+           out MembershipCreateStatus status)
     {
-        IdentityService identityService = new IdentityService(_sessionFactory.Instance.OpenSession());
-        MembershipUser user = new IdentityServiceMembershipUser(identityService.CreateUser(username, password));
+        IdentityService identityService = 
+          new IdentityService(_sessionFactory.Instance.OpenSession());
+        MembershipUser user = new IdentityServiceMembershipUser(
+                                  identityService.CreateUser(username, password));
         status = MembershipCreateStatus.Success;
         return user;
     }
 
     public override MembershipUser GetUser(string username, bool userIsOnline)
     {
-        IdentityService identityService = new IdentityService(_sessionFactory.Instance.OpenSession());
-        return new IdentityServiceMembershipUser(identityService.FindUser(username));
+        IdentityService identityService = 
+          new IdentityService(_sessionFactory.Instance.OpenSession());
+        return new IdentityServiceMembershipUser(
+                   identityService.FindUser(username));
     }
-}
-   </pre>
-  <p>
-   The membership provider is configured in Web.config. We will use Forms authentication,
-   deny access to all pages by default and define a custom membership provider above
-   that exposes our database users. This enables login and implements authentication.</p>
-  <pre lang="xml">
- &lt;system.web&gt;
+}</pre>
+   <p>
+    The Membership Provider is configured in <em>Web.config</em>. We will use Forms
+    authentication, deny access to all pages by default, and define a custom membership
+    provider above that exposes our database users. This enables login, and implements
+    authentication.</p>
+   <pre lang="xml">&lt;system.web&gt;
   &lt;authorization&gt;
-   &lt;deny users="?" /&gt;
+   &lt;deny users=&quot;?&quot; /&gt;
   &lt;/authorization&gt;
-  &lt;authentication mode="Forms" /&gt;
-  &lt;membership defaultProvider="IdentityServiceMembershipProvider"&gt;
+  &lt;authentication mode=&quot;Forms&quot; /&gt;
+  &lt;membership defaultProvider=&quot;IdentityServiceMembershipProvider&quot;&gt;
    &lt;providers&gt;
-    &lt;add name="IdentityServiceMembershipProvider" type="IdentityServiceMembershipProvider" /&gt;
+    &lt;add name=&quot;IdentityServiceMembershipProvider&quot; 
+       type=&quot;IdentityServiceMembershipProvider&quot; /&gt;
    &lt;/providers&gt;
   &lt;/membership&gt;
   ...
 &lt;/system.web&gt;</pre>
-  <p>
-   The ASP.NET pipeline serves us single requests in Global.asax post authentication.
-   We can initialize the <code>SessionManager</code> accordingly for each request with
-   the user context returned by the authentication system. This ties everything together.</p>
-  <pre lang="cs">
-public void Application_Start(Object sender, EventArgs e)
+   <p>
+    The ASP.NET pipeline serves us single requests in <em>Global.asax</em> post authentication.
+    We can initialize the <code>SessionManager</code> accordingly for each request with
+    the user context returned by the authentication system. This ties everything together.</p>
+   <pre lang="cs">public void Application_Start(Object sender, EventArgs e)
 {
-    SessionManager.Initialize(new HttpSessionSource(), ServiceDataEventListeners.Instance);
+    SessionManager.Initialize(new HttpSessionSource(), 
+                   ServiceDataEventListeners.Instance);
 }
 
 public void Application_PostAuthenticateRequest(Object sender, EventArgs e)
 {
-    IdentityServiceMembershipUser user = (IdentityServiceMembershipUser) Membership.GetUser();
+    IdentityServiceMembershipUser user = 
+      (IdentityServiceMembershipUser) Membership.GetUser();
     if (user == null || user.Account == null)
     {
         SessionManager.CurrentSessionContext = new GuestUserContext();
@@ -717,48 +639,55 @@ public void Application_PostAuthenticateRequest(Object sender, EventArgs e)
     {
         SessionManager.CurrentSessionContext = new UserContext(user.Account);
     }
-}
-    </pre>
-  <h2>
-   Demo</h2>
-  <p>
-   The project contains a rudimentary blogging system. The simplest way to run it is
-   from Visual Studio 2008. You will first need to create a database called <em>OLS</em>
-   and populate it with the <em>ols.sql</em> script from the package. Try registering
-   a user, logging in and creating blogs and posts. Create another user and try to
-   post to the blog of the first user (you can see other people&#39;s blogs on the
-   front page). You will get an access denied exception.</p>
-  <h2>
-   Conclusion</h2>
-  <p>
-   After implementing the ACL-based authorization framework the developer doesn&#39;t
-   need to worry about checking access anywhere in the business logic. A security architect
-   can now independently design access on a per-class basis, translating business reqiurements
-   directly into access control. From the security point of view this is much less
-   error-prone and completely solves any accidental retrieval of unauthorized data.</p>
-  <h2>
-   Source Code and Patches
- </h2>
- <p>
-    The latest version of this article and source code can always be found in <a href="http://subversion.tigris.org/">
-     Subversion</a> under <a href="svn://svn.vestris.com/codeproject/ObjectLevelSecurity/">
-      svn://svn.vestris.com/codeproject/ObjectLevelSecurity</a>. You can also <a href="http://svn.vestris.com/listing.php?repname=Vestris+SVN&path=%2Fcodeproject%2FObjectLevelSecurity%2FSource%2F#_codeproject_ObjectLevelSecurity_Source_">
-       browse the source code</a>. You can find the latest information about this project
-    at <a href="http://code.dblock.org">code.dblock.org</a>.</p>
+}</pre>
+   <h2>
+    Demo</h2>
+   <p>
+    The project contains a rudimentary blogging system. The simplest way to run it is
+    from Visual Studio 2008. You will first need to create a database called <em>OLS</em>
+    and populate it with the <em>ols.sql</em> script from the package. Try registering
+    a user, logging in, and creating blogs and posts. Create another user, and try to
+    post to the blog of the first user (you can see other people's blogs on the front
+    page). You will get an access denied exception.</p>
+   <h2>
+    Using the Code</h2>
+   <p>
+    You can reuse several parts of this code with some minor modifications.
+    <ul>
+     <li><b>Service.NHibernate</b>: contains a session factory, context, event listeners,
+      manager, opened and storage. The configuration parts of the library will have to
+      change for your application, but the rest works "out of the box".</li>
+     <li><b>Service.Identity</b>: contains identity and user context objects; you will
+      need to change the code to support your back-end.</li>
+     <li><b>Service.Data</b>: contains ACL implementation, the authorization connector
+      and data interceptor. Remove all demo-specific ACL classes and reuse as is.</li>
+     <li><b>Blogs/Global.asax</b>: contains intialization code for a web application. 
+      Copy the initialization code to yours.</li>
+    </ul>
+   </p>
+   <h2>
+    Conclusion</h2>
+   <p>
+    After implementing the ACL-based authorization framework, the developer doesn't
+    need to worry about checking access anywhere in the business logic. A security architect
+    can now independently design access on a per-class basis, translating business requirements
+    directly into access control. From the security point of view, this is much less
+    error-prone, and completely solves any accidental retrieval of unauthorized data.</p>
+   <h2>
+    Source Code and Patches</h2>
+   <p>
+    The latest version of this article and source code can always be found in <a href="http://subversion.tigris.org/"
+     target="_blank">Subversion</a> under <a href="svn://svn.vestris.com/codeproject/ObjectLevelSecurity/"
+      target="_blank">svn://svn.vestris.com/codeproject/ObjectLevelSecurity</a>. You
+    can also <a href="http://svn.vestris.com/listing.php?repname=Vestris+SVN&amp;path=%2Fcodeproject%2FObjectLevelSecurity%2FSource%2F#_codeproject_ObjectLevelSecurity_Source_"
+     target="_blank">browse the source code</a>. You can find the latest information
+    about this project at <a href="http://code.dblock.org/" target="_blank">code.dblock.org</a>.</p>
    <h2>
     History</h2>
-    <ul>
-     <li>01/21/2009: initial version</li>
-    </ul>
-   <h2>
-    License
-   </h2>
-   <p>
-    This library, along with any associated source code and files, is published under
-    the <a href="http://www.codeproject.com/info/licenses.aspx">CPOL</a> license, please
-    reuse.
-   </p>
-   <!-------------------------------    That's it!   --------------------------->
- </li>
+   <ul>
+    <li>01/21/2009: Initial version.</li>
+   </ul>
+  </span>
+ </div>
 </body>
 </html>
