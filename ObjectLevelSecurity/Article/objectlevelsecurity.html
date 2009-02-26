@@ -427,7 +427,8 @@ cfg.EventListeners.PostLoadEventListeners = Insert(cfg.EventListeners.PostLoadEv
 SessionManager.Initialize(new HttpSessionSource(), ServiceDataEventListeners.Instance); 
 SessionManager.CurrentSessionContext = new GuestUserContext();</pre>
  <h3>
-  Access Control Lists<p>
+  Access Control Lists</h3>
+<p>
    An Access Control List (ACL) is a list of permissions attached to an object. Each
    entry defines a <code>DataOperationPermission</code> (a type of data access allowed
    or denied) for a type of <code>DataOperation</code>. An ACL can then render a verdict
@@ -736,7 +737,9 @@ public void Application_PostAuthenticateRequest(Object sender, EventArgs e)
    directly into access control. From the security point of view this is much less
    error-prone and completely solves any accidental retrieval of unauthorized data.</p>
   <h2>
-   Source Code and Patches<p>
+   Source Code and Patches
+ </h2>
+ <p>
     The latest version of this article and source code can always be found in <a href="http://subversion.tigris.org/">
      Subversion</a> under <a href="svn://svn.vestris.com/codeproject/ObjectLevelSecurity/">
       svn://svn.vestris.com/codeproject/ObjectLevelSecurity</a>. You can also <a href="http://svn.vestris.com/listing.php?repname=Vestris+SVN&path=%2Fcodeproject%2FObjectLevelSecurity%2FSource%2F#_codeproject_ObjectLevelSecurity_Source_">
