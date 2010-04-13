@@ -1,0 +1,7 @@
+dn: cn=schema
+objectClass: top
+objectClass: ldapSubentry
+objectClass: subschema
+cn: schema
+attributeTypes: ( 1.2.840.113556.1.8000.2554.999999.1 NAME 'serviceUri' DESC 'service URI' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+objectClasses: ( 1.2.840.113556.1.8000.2554.999999.2 NAME 'Service' DESC 'a SOAP Service' SUP top STRUCTURAL MUST ( cn $ name $ objectClass $ uid $ serviceUri ) )
