@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="NTEventLogAppender" default="build" basedir=".">
+	<property name="NTEventLogAppender.java.version" value="1.5" />
+	<property name="NTEventLogAppender.copyright" value="" />
+	<property name="NTEventLogAppender.root" value="${basedir}" />
+	<property name="NTEventLogAppender.build" value="${NTEventLogAppender.root}/build" />
+	<property name="NTEventLogAppender.doc" value="${NTEventLogAppender.root}/doc" />
+	<property name="NTEventLogAppender.lib" value="${NTEventLogAppender.root}/lib" />
+	<property name="NTEventLogAppender.src" value="${NTEventLogAppender.root}/src" />
+	<property name="NTEventLogAppender.test.src" value="${NTEventLogAppender.root}/src-test" />
+	<property name="NTEventLogAppender.test.lib" value="${NTEventLogAppender.root}/lib-test" />
+	<property name="NTEventLogAppender.test" value="${NTEventLogAppender.root}/test" />
+	<property name="thirdparty.dir" location="${basedir}/ThirdParty" />
+	<!-- compile -->
+	<path id="jna.classpath">
+		<fileset dir="${thirdparty.dir}/jna">
+			<include name="jna.jar" />
+			<include name="platform.jar" />
+		</fileset>
+	</path>
+	<path id="NTEventLogAppender.classpath">
+		<path refid="jna.classpath" />
+	</path>
+	<macrodef name="compile">
+		<attribute name="optimize" />
+		<attribute name="debug" />
+		<sequential>
+			<delete dir="${NTEventLogAppender.lib}" />
+			<mkdir dir="${NTEventLogAppender.lib}" />
+			<javac target="${NTEventLogAppender.java.version}" srcdir="${NTEventLogAppender.src}"
+				destdir="${NTEventLogAppender.lib}" optimize="@{optimize}" debug="@{debug}">
+				<classpath refid="NTEventLogAppender.classpath" />
+				<include name="**/*.java" />
+			</javac>
+		</sequential>
+	</macrodef>
+	<!-- test -->
+	<path id="NTEventLogAppender.test.classpath">
+		<pathelement location="${NTEventLogAppender.lib}" />
+		<path refid="NTEventLogAppender.classpath" />
+		<fileset dir="${thirdparty.dir}/junit">
+			<include name="*.jar" />
+		</fileset>
+		<pathelement location="${NTEventLogAppender.test.src}" />
+		<pathelement location="${NTEventLogAppender.test.lib}" />
+	</path>
+	<target name="compile-tests">
+		<mkdir dir="${NTEventLogAppender.test.lib}" />
+		<javac target="${NTEventLogAppender.java.version}" srcdir="${NTEventLogAppender.test.src}"
+			destdir="${NTEventLogAppender.test.lib}" optimize="no" debug="yes">
+			<classpath refid="NTEventLogAppender.test.classpath" />
+			<include name="**/*.java" />
+		</javac>
+	</target>
+	<target name="test" depends="compile-tests">
+		<mkdir dir="${NTEventLogAppender.test}" />
+		<junit fork="true" newenvironment="true" failureproperty="tests.failed"
+			haltonfailure="no" haltonerror="no" printsummary="on" errorproperty="tests.failed">
+			<batchtest todir="${NTEventLogAppender.test}">
+				<fileset dir="${NTEventLogAppender.test.lib}" includes="**/*Tests.class" />
+			</batchtest>
+			<formatter type="xml" />
+			<classpath refid="NTEventLogAppender.test.classpath" />
+		</junit>
+		<fail message="Unit Tests failed" if="tests.failed" />
+	</target>
+	<!-- package -->
+	<target name="jar">
+		<delete dir="${NTEventLogAppender.build}" />
+		<mkdir dir="${NTEventLogAppender.build}" />
+		<jar jarfile="${NTEventLogAppender.build}/NTEventLogAppender-jna.jar">
+			<fileset dir="${NTEventLogAppender.lib}">
+				<include name="NTEventLogAppender/**/*.class" />
+			</fileset>
+			<manifest>
+				<attribute name="Version" value="${NTEventLogAppender.version}" />
+				<attribute name="Created-By" value="${NTEventLogAppender.copyright}" />
+			</manifest>
+		</jar>
+		<jar jarfile="${NTEventLogAppender.build}/NTEventLogAppender-src.zip">
+			<fileset dir="${NTEventLogAppender.src}">
+				<include name="NTEventLogAppender/**/*.java" />
+			</fileset>
+			<manifest>
+				<attribute name="Version" value="${NTEventLogAppender.version}" />
+				<attribute name="Created-By" value="${NTEventLogAppender.copyright}" />
+			</manifest>
+		</jar>
+	</target>
+	<target name="doc">
+		<javadoc destdir="${NTEventLogAppender.doc}" sourcepath="${NTEventLogAppender.src}"
+			classpathref="NTEventLogAppender.classpath" />
+	</target>
+	<target name="clean">
+		<delete dir="${NTEventLogAppender.build}" />
+		<delete dir="${NTEventLogAppender.lib}" />
+		<delete dir="${NTEventLogAppender.test.lib}" />
+		<delete dir="${NTEventLogAppender.doc}" />
+		<delete dir="${NTEventLogAppender.test}" />
+	</target>
+	<target name="compile">
+		<echo message="Building version ${NTEventLogAppender.version}" />
+		<compile debug="no" optimize="yes" />
+		<antcall target="jar" />
+	</target>
+	<target name="build">
+		<echo message="Building version ${NTEventLogAppender.version}" />
+		<compile debug="no" optimize="yes" />
+		<antcall target="jar" />
+		<antcall target="test" />
+		<antcall target="doc" />
+	</target>
+	<target name="clean-build" depends="clean,build" />
+</project>
